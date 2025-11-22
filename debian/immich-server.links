@@ -1,0 +1,4 @@
+etc/default/immich-server etc/immich/server.env
+usr/share/immich/geo usr/share/immich/build/geodata
+usr/share/immich/plugins usr/share/immich/build/corePlugin
+usr/share/immich/web usr/share/immich/build/www

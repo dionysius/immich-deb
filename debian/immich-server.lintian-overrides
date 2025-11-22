@@ -1,0 +1,42 @@
+script-not-executable [var/lib/immich/server/dist/bin/*.d.ts]
+script-not-executable [var/lib/immich/server/dist/bin/*.js]
+
+# prebuilt binaries
+binary-from-other-architecture [var/lib/immich/server/node_modules/*/bcrypt/prebuilds/*]
+library-not-linked-against-libc [var/lib/immich/server/node_modules/*/bcrypt/prebuilds/*]
+
+# irrelevant documentation files
+privacy-breach-generic * [var/lib/immich/server/node_modules/*/fluent-ffmpeg/doc/*]
+
+# no code
+no-code-sections [var/lib/immich/server/node_modules/*/sharp/*]
+
+# python cache
+package-installs-python-pycache-dir  [var/lib/immich/server/node_modules/*/node-gyp/gyp/*]
+
+# for now we allow hardlinks from pnpm (hopefully unlikely that admins put immich folders on different filesystems)
+package-contains-hardlink pointing to: var/lib/immich/server/node_modules/.pnpm/*
+package-contains-hardlink pointing to: var/lib/immich/server/.pnpm-store/*
+
+# unreasonable to filter selectively due to amount of packages affected
+executable-not-elf-or-script [var/lib/immich/server/node_modules/*]
+package-contains-eslint-config-file [var/lib/immich/server/node_modules/*]
+package-contains-npm-ignore-file [var/lib/immich/server/node_modules/*]
+package-contains-vcs-control-file [var/lib/immich/server/node_modules/*]
+embedded-javascript-library * [var/lib/immich/server/node_modules/*]
+
+# impossible to filter selectively due to the way pnpm stores the files (mostly duplicates of above)
+binary-from-other-architecture [var/lib/immich/server/.pnpm-store/*]
+executable-not-elf-or-script [var/lib/immich/server/.pnpm-store/*]
+library-not-linked-against-libc [var/lib/immich/server/.pnpm-store/*]
+missing-dep-for-interpreter * [var/lib/immich/server/.pnpm-store/*]
+missing-dependency-on-libc needed by var/lib/immich/server/.pnpm-store/*
+no-code-sections [var/lib/immich/server/.pnpm-store/*]
+python3-script-but-no-python3-dep * [var/lib/immich/server/.pnpm-store/*]
+script-not-executable [var/lib/immich/server/.pnpm-store/*]
+shared-library-is-executable 0755 [var/lib/immich/server/.pnpm-store/*]
+unstripped-binary-or-object [var/lib/immich/server/.pnpm-store/*]
+
+# if pnpm is on package-import-method=copy
+# python3-script-but-no-python3-dep * [var/lib/immich/server/node_modules/.pnpm/node-gyp*]
+# script-not-executable [var/lib/immich/server/node_modules/*]

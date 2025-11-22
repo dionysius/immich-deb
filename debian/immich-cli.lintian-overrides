@@ -1,0 +1,14 @@
+script-not-executable [var/lib/immich/cli/dist/*.js]
+
+# for now we allow hardlinks from pnpm (hopefully unlikely that admins put immich folders on different filesystems)
+package-contains-hardlink pointing to: var/lib/immich/cli/.pnpm-store/*
+
+# unreasonable to filter selectively due to amount of packages affected
+embedded-javascript-library * [var/lib/immich/cli/node_modules/*]
+
+# impossible to filter selectively due to the way pnpm stores the files (mostly duplicates of above)
+executable-not-elf-or-script [var/lib/immich/cli/.pnpm-store/*]
+
+# if pnpm is on package-import-method=copy
+# executable-not-elf-or-script [var/lib/immich/cli/node_modules/*]
+# package-contains-hardlink pointing to: var/lib/immich/cli/node_modules/.pnpm/*

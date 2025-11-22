@@ -1,0 +1,144 @@
+Source: immich
+Section: web
+Priority: optional
+# add binaryen and remove manual download in rules once ubuntu has the package
+# >= 120 in 26.04 LTS, debian trixie is ready - IF this version is sufficient
+Build-Depends: curl,
+               debhelper-compat (= 13),
+               gawk,
+               help2man,
+               libvips-dev (>= 8.17.2),
+               nodejs (>= 22) | npm,
+               pkgconf,
+               unzip,
+Maintainer: dionysius <dragon.dionysius@gmail.com>
+Standards-Version: 4.6.1
+Vcs-Git: https://github.com/dionysius/immich-deb.git
+Vcs-Browser: https://github.com/dionysius/immich-deb
+Homepage: https://immich.app
+Rules-Requires-Root: no
+
+Package: immich
+Architecture: all
+Depends: immich-machine-learning,
+         immich-server,
+         ${misc:Depends},
+# Recommends are installed by default unless explicitly excluded, which is
+# a valid choice if the databases are run externally
+Recommends: immich-db-reqs,
+            redis-server,
+Suggests: immich-cli,
+Description: Self-hosted photo and video management solution - All-In-One
+ Easily back up, organize, and manage your photos on your own server. immich
+ helps you browse, search and organize your photos and videos with ease,
+ without sacrificing your privacy.
+ .
+ This metapackage installs all immich server components along with the
+ PostgreSQL database with pgvector extension and Redis server.
+
+Package: immich-server
+Architecture: any
+Pre-Depends: ${misc:Pre-Depends},
+Depends:
+#         libpq5,
+         imagemagick,
+         immich-geo-data,
+         immich-web-data (= ${source:Version}),
+         jellyfin-ffmpeg7 | ffmpeg,
+         libvips42t64 (>= 8.17.2),
+         nodejs (>= 22),
+         ${misc:Depends},
+         ${shlibs:Depends},
+Recommends: immich-machine-learning,
+            ${misc:Recommends},
+Built-Using: ${misc:Built-Using},
+Description: Self-hosted photo and video management solution - main server
+ Easily back up, organize, and manage your photos on your own server. immich
+ helps you browse, search and organize your photos and videos with ease,
+ without sacrificing your privacy.
+ .
+ This package contains the main immich server which handles the backend API,
+ database operations, media processing, and serves the web interface.
+
+Package: immich-machine-learning
+Architecture: any
+Pre-Depends: ${misc:Pre-Depends},
+# Unfortunately immich requires specific python version, so manage with uv
+# Depends: python-is-python3,
+#          python3-fastapi,
+#          python3-gunicorn,
+#          python3-huggingface-hub, # could be backported
+#          python3-onnxruntime,
+#          python3-orjson,
+#          python3-pydantic-settings,
+#          python3-huggingface-tokenizers, # this is missing
+#          ... and maybe more
+Depends: python3,
+         ${misc:Depends},
+Recommends: ${misc:Recommends},
+Built-Using: ${misc:Built-Using},
+Description: Self-hosted photo and video management solution - ML server
+ Easily back up, organize, and manage your photos on your own server. immich
+ helps you browse, search and organize your photos and videos with ease,
+ without sacrificing your privacy.
+ .
+ This package contains the machine learning server which handles AI-powered
+ features such as facial recognition and object detection.
+
+Package: immich-geo-data
+Architecture: all
+Pre-Depends: ${misc:Pre-Depends},
+Depends: ${misc:Depends},
+Recommends: ${misc:Recommends},
+Built-Using: ${misc:Built-Using},
+Description: Self-hosted photo and video management solution - geo data
+ Easily back up, organize, and manage your photos on your own server. immich
+ helps you browse, search and organize your photos and videos with ease,
+ without sacrificing your privacy.
+ .
+ This package contains geo data resources used by immich.
+
+Package: immich-cli
+Architecture: any
+Pre-Depends: ${misc:Pre-Depends},
+Depends: nodejs (>= 22),
+         ${misc:Depends},
+Recommends: ${misc:Recommends},
+Built-Using: ${misc:Built-Using},
+Description: Self-hosted photo and video management solution - CLI client
+ Easily back up, organize, and manage your photos on your own server. immich
+ helps you browse, search and organize your photos and videos with ease,
+ without sacrificing your privacy.
+ .
+ This package contains the command line interface client that allows you to
+ perform certain actions to immich from the command line.
+
+Package: immich-web-data
+Architecture: all
+Pre-Depends: ${misc:Pre-Depends},
+Depends: ${misc:Depends},
+Recommends: ${misc:Recommends},
+Built-Using: ${misc:Built-Using},
+Description: Self-hosted photo and video management solution - web data
+ Easily back up, organize, and manage your photos on your own server. immich
+ helps you browse, search and organize your photos and videos with ease,
+ without sacrificing your privacy.
+ .
+ This package contains the web interface for immich, allowing users to interact
+ with their photos and videos through a modern web application.
+
+Package: immich-db-reqs
+Architecture: all
+Pre-Depends: ${misc:Pre-Depends},
+Depends: postgresql,
+         postgresql-pgvector | postgresql-18-pgvector | postgresql-17-pgvector | postgresql-16-pgvector | postgresql-15-pgvector | postgresql-14-pgvector,
+         ${misc:Depends},
+Recommends: ${misc:Recommends},
+Built-Using: ${misc:Built-Using},
+Description: Self-hosted photo and video management solution - db requirements
+ Easily back up, organize, and manage your photos on your own server. immich
+ helps you browse, search and organize your photos and videos with ease,
+ without sacrificing your privacy.
+ .
+ This metapackage helps installing the required database and extensions by
+ defining those as dependencies.

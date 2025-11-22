@@ -1,0 +1,111 @@
+### immich machine learning configuration environment file ###
+# This file is parsed by systemd as EnvironmentFile for the immich-machine-learning service.
+# Be aware that this is a dockerless installation, so no settings related to
+# docker or docker compose from the official documentation apply here.
+# Environment variables below are derived from https://docs.immich.app/install/environment-variables/
+
+### General settings ###
+# Environment (production, development)
+IMMICH_ENV=production
+# Log level (verbose, debug, log, warn, error)
+IMMICH_LOG_LEVEL=log
+# Set to true to disable color-coded log output
+#NO_COLOR=false
+# Hardware acceleration mode (one of [armnn, cuda, cpu, rocm, openvino, rknn])
+DEVICE=cpu
+# Directory where models are downloaded
+MACHINE_LEARNING_CACHE_FOLDER=/var/cache/immich
+# Cache directory for the transformers
+TRANSFORMERS_CACHE=/var/cache/immich
+
+### Listener settings ###
+# These environment variables are not official, made available by a patch of
+# this debian package. May be changed to official ones once available.
+# Listening host
+MACHINE_LEARNING_HOST=127.0.0.1
+# Listening port
+MACHINE_LEARNING_PORT=3003
+
+### Machine Learning settings ###
+# Additional machine learning parameters can be tuned from the admin UI.
+# Inactivity time (s) before a model is unloaded (disabled if <= 0)
+#MACHINE_LEARNING_MODEL_TTL=300
+# Interval (s) between checks for the model TTL (disabled if <= 0)
+#MACHINE_LEARNING_MODEL_TTL_POLL_S=10
+# Thread count of the request thread pool (disabled if <= 0) (number of CPU
+# cores if unset). It is recommended to begin with this parameter when changing
+# the concurrency levels of the machine learning service and then tune the
+# other ones
+#MACHINE_LEARNING_REQUEST_THREADS=
+# Number of parallel model operations
+#MACHINE_LEARNING_MODEL_INTER_OP_THREADS=1
+# Number of threads for each model operation
+#MACHINE_LEARNING_MODEL_INTRA_OP_THREADS=2
+# Number of worker processes to spawn
+# Since each process duplicates models in memory, changing this is not
+# recommended unless you have abundant memory to go around
+#MACHINE_LEARNING_WORKERS=1
+# HTTP Keep-alive time in seconds
+#MACHINE_LEARNING_HTTP_KEEPALIVE_TIMEOUT_S=2
+# Maximum time (s) of unresponsiveness before a worker is killed
+# (default 300 if using OpenVINO)
+#MACHINE_LEARNING_WORKER_TIMEOUT=120
+# Comma-separated list of (textual) CLIP model(s) to preload and cache
+#MACHINE_LEARNING_PRELOAD__CLIP__TEXTUAL=
+# Comma-separated list of (visual) CLIP model(s) to preload and cache
+#MACHINE_LEARNING_PRELOAD__CLIP__VISUAL=
+# Comma-separated list of (recognition) facial recognition model(s) to preload
+# and cache
+#MACHINE_LEARNING_PRELOAD__FACIAL_RECOGNITION__RECOGNITION=
+# Comma-separated list of (detection) facial recognition model(s) to preload
+# and cache
+#MACHINE_LEARNING_PRELOAD__FACIAL_RECOGNITION__DETECTION=
+# Enable ARM-NN hardware acceleration if supported
+#MACHINE_LEARNING_ANN=True
+# Execute operations in FP16 precision: increasing speed, reducing precision
+# (applies only to ARM-NN)
+#MACHINE_LEARNING_ANN_FP16_TURBO=False
+# ARM-NN GPU tuning level (1: rapid, 2: normal, 3: exhaustive)
+#MACHINE_LEARNING_ANN_TUNING_LEVEL=2
+# Device IDs to use in multi-GPU environments
+# Using multiple GPUs requires MACHINE_LEARNING_WORKERS to be set greater than
+# 1. A single device is assigned to each worker in round-robin priority.
+#MACHINE_LEARNING_DEVICE_IDS=0
+# Set the maximum number of faces that will be processed at once by the facial
+# recognition model (default 1 if using OpenVINO)
+#MACHINE_LEARNING_MAX_BATCH_SIZE__FACIAL_RECOGNITION=None
+# Set the maximum number of boxes that will be processed at once by the OCR
+# model
+#MACHINE_LEARNING_MAX_BATCH_SIZE__OCR=6
+# Enable RKNN hardware acceleration if supported
+#MACHINE_LEARNING_RKNN=True
+# How many threads of RKNN runtime should be spun up while inferencing
+#MACHINE_LEARNING_RKNN_THREADS=1
+# Pre-allocates CPU memory to avoid memory fragmentation
+#MACHINE_LEARNING_MODEL_ARENA=true
+# If set to FP16, uses half-precision floating-point operations for faster
+# inference with reduced accuracy (one of [FP16, FP32], applies only to OpenVINO)
+#MACHINE_LEARNING_OPENVINO_PRECISION=FP32
+
+### UV runtime settings ###
+# Currently there are outdated and missing python dependencies in apt repos so
+# the service is run with uv. If possible we'd remove this in the future but
+# is unlikely with all the requirements including which python version is run.
+# more info: https://github.com/immich-app/immich/issues/15038
+# uv will use the installed python automatically if in the right version
+# more options: https://docs.astral.sh/uv/reference/environment/#environment-variables
+UV_CACHE_DIR=.local/uv-cache
+UV_COMPILE_BYTECODE=true
+UV_PROJECT_ENVIRONMENT=.local/venv
+UV_FROZEN=true
+UV_NO_DEV=true
+UV_NO_EDITABLE=true
+UV_NO_PROGRESS=true
+UV_PYTHON=3.12.3
+UV_PYTHON_INSTALL_DIR=.local/uv-python
+UV_REQUIRE_HASHES=true
+
+### Other settings ###
+# Since this file exposes environment variables to the immich machine learning
+# service, any variable customization for modules can also be set here.
+MPLCONFIGDIR=.local/matplotlib

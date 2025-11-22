@@ -1,0 +1,151 @@
+#!/usr/bin/make -f
+
+include /usr/share/dpkg/default.mk
+
+export DH_VERBOSE = 1
+MAKEFLAGS += --no-print-directory
+
+# common locations
+TMPDEB = debian/tmp
+TMPBUILD = $(TMPDEB)/build
+TMPGEODATA = $(TMPDEB)/geo
+PNPMSTORE = .pnpm-store
+
+# build environment variables
+export NODE_ENV = production
+export CI = 1
+export COREPACK_ENABLE_DOWNLOAD_PROMPT = 0
+
+# export dpkg variables for helper scripts
+export DEB_SOURCE DEB_VERSION DEB_VERSION_UPSTREAM DEB_BUILD_ARCH DEB_DISTRIBUTION DEB_VENDOR
+
+# make build-specific binaries available in PATH
+export PATH := $(CURDIR)/$(TMPBUILD)/bin:$(PATH)
+
+# extism-js version to use (>= 1.4.0, needs glibc >= 2.39)
+# debian trixie glibc=2.41
+# ubuntu noble glibc=2.39
+EXTISM_JS_VERSION = 1.5.1
+EXTISM_JS_SHA256_x86_64 = f6a4a3a8f16651a527a4643f95d229c854a04d66d4628cdc724a58c699b93c95
+EXTISM_JS_SHA256_aarch64 = 28cdffcb7d4e74b98401c738f1348b9977a2d860fa1613876250fb5bf12b3fe2
+# binaryen version to use (need wasm-merge, which seems to exist >= 120)
+# current ubuntu LTS package is outdated, debian stable is ok
+BINARYEN_VERSION = 125
+BINARYEN_SHA256_x86_64 = 7c3bc16599c8274a04d34a504fe4be2047884f900e0e2da2f6fb9cd667183be4
+BINARYEN_SHA256_aarch64 = d0382de3c189a7cbb9fdda93e2966f4557f6a00f201e2c4937c27ca01cead4fc
+
+# uv version to use (since debian has not packaged it yet)
+UV_VERSION = 0.9.13
+UV_SHA256_x86_64 = c45a44144bf23a2182e143227b4ad0bbe41a2bb7161a637c02e968906af53fd1
+UV_SHA256_aarch64 = c221d04810f873a7aa8bae9aa6ed721e600e56534980df1363952386a4fcdcc5
+
+# steps mostly imitate official docker images, so changes there may need to be reflected here
+# - https://github.com/immich-app/base-images/blob/main/server/Dockerfile
+# - https://github.com/immich-app/immich/blob/main/server/Dockerfile
+# - https://github.com/immich-app/immich/blob/main/machine-learning/Dockerfile
+
+%:
+	dh $@
+
+override_dh_auto_clean:
+	dh_auto_clean
+	rm -rf $(PNPMSTORE)
+	rm -rf server/dist web/build cli/dist plugins/dist
+	rm -f $(CURDIR)/.npmrc
+
+override_dh_auto_configure:
+	mkdir -p $(TMPBUILD)/bin
+
+# obtain required npm packages for building
+	npm install --no-save corepack
+	ln -srf node_modules/.bin/corepack $(TMPBUILD)/bin/corepack
+	corepack enable
+	corepack prepare pnpm@latest-10 --activate
+	ln -srf node_modules/.bin/pnpm $(TMPBUILD)/bin/pnpm
+
+# create local .npmrc for pnpm configuration to avoid global config changes
+# for now we allow hardlinks from pnpm (hopefully unlikely that admins put immich folders on different filesystems)
+# even with package-import-method=copy there were some sharp builds hardlinked
+	printf "store-dir=$(PNPMSTORE)\n" > $(CURDIR)/.npmrc
+
+# obtain extism-js manually (npm doesn't provide it)
+# ref: https://github.com/extism/js-pdk/releases/download/v1.2.0/extism-js-x86_64-linux-v1.2.0.gz
+	curl -sSL https://github.com/extism/js-pdk/releases/download/v$(EXTISM_JS_VERSION)/extism-js-$(DEB_BUILD_GNU_CPU)-$(DEB_BUILD_ARCH_OS)-v$(EXTISM_JS_VERSION).gz -o $(TMPBUILD)/extism-js.gz
+	cd $(TMPBUILD); echo "$(EXTISM_JS_SHA256_$(DEB_BUILD_GNU_CPU)) extism-js.gz" | sha256sum -c -
+	cd $(TMPBUILD); gunzip -c extism-js.gz > bin/extism-js
+	cd $(TMPBUILD); chmod +x bin/extism-js
+
+# obtain binaryen manually (package too old in latest ubuntu LTS, debian trixie might be ok but not latest)
+# ref: https://github.com/WebAssembly/binaryen/releases/download/version_120/binaryen-version_120-x86_64-linux.tar.gz
+	curl -sSL https://github.com/WebAssembly/binaryen/releases/download/version_$(BINARYEN_VERSION)/binaryen-version_$(BINARYEN_VERSION)-$(DEB_BUILD_GNU_CPU)-$(DEB_BUILD_ARCH_OS).tar.gz -o $(TMPBUILD)/binaryen.tar.gz
+	cd $(TMPBUILD); echo "$(BINARYEN_SHA256_$(DEB_BUILD_GNU_CPU)) binaryen.tar.gz" | sha256sum -c -
+	cd $(TMPBUILD); tar --strip-components=1 -xzf binaryen.tar.gz
+
+# obtain uv manually (debian has not yet packaged it, and I think currently this variant is better than downloading it at runtime with pip and python-venv)
+# ref: https://github.com/astral-sh/uv/releases/download/0.9.13/uv-x86_64-unknown-linux-gnu.tar.gz
+	curl -sSL https://github.com/astral-sh/uv/releases/download/$(UV_VERSION)/uv-$(DEB_BUILD_GNU_CPU)-unknown-$(DEB_BUILD_ARCH_OS)-$(DEB_BUILD_ARCH_LIBC).tar.gz -o $(TMPBUILD)/uv.tar.gz
+	cd $(TMPBUILD); echo "$(UV_SHA256_$(DEB_BUILD_GNU_CPU)) uv.tar.gz" | sha256sum -c -
+	cd $(TMPBUILD); tar --strip-components=1 -xzf uv.tar.gz
+	mkdir -p machine-learning/bin
+	mv $(TMPBUILD)/uv machine-learning/bin
+
+# download geodata required for server
+# TODO: is this the responsibility of the package build or should this be done at first run of the server and offer an update script?
+# TODO2: is debian gis useful? https://www.debian.org/blends/gis/get/metapackages
+	mkdir -p $(TMPGEODATA)
+	curl -sSL https://download.geonames.org/export/dump/admin1CodesASCII.txt -o $(TMPGEODATA)/admin1CodesASCII.txt
+	curl -sSL https://download.geonames.org/export/dump/admin2Codes.txt -o $(TMPGEODATA)/admin2Codes.txt
+	curl -sSL https://download.geonames.org/export/dump/cities500.zip -o $(TMPGEODATA)/cities500.zip
+	curl -sSL https://raw.githubusercontent.com/nvkelso/natural-earth-vector/v5.1.2/geojson/ne_10m_admin_0_countries.geojson -o $(TMPGEODATA)/ne_10m_admin_0_countries.geojson
+	cd $(TMPGEODATA); unzip -o cities500.zip; rm cities500.zip
+	date --iso-8601=seconds | tr -d "\n" > $(TMPGEODATA)/geodata-date.txt
+
+override_dh_auto_build:
+# we may need to add --cpu and --os to pnpm install and deploy commands for package cross-building
+	SHARP_IGNORE_GLOBAL_LIBVIPS=true pnpm --filter immich --frozen-lockfile build
+	SHARP_FORCE_GLOBAL_LIBVIPS=true pnpm --filter immich --frozen-lockfile --prod --no-optional deploy $(TMPDEB)/var/lib/immich/server
+
+	pnpm --filter @immich/sdk --filter immich-web --frozen-lockfile install
+	SHARP_IGNORE_GLOBAL_LIBVIPS=true pnpm --filter @immich/sdk --filter immich-web --frozen-lockfile build
+
+	pnpm --filter @immich/sdk --filter @immich/cli --frozen-lockfile install
+	pnpm --filter @immich/sdk --filter @immich/cli --frozen-lockfile build
+	pnpm --filter @immich/cli --frozen-lockfile --prod --no-optional deploy $(TMPDEB)/var/lib/immich/cli
+
+	pnpm --filter plugins --frozen-lockfile install
+	pnpm --filter plugins --frozen-lockfile build
+
+# TODO: predownload and prebuild python packages with uv
+
+# additional doc files
+	mkdir -p $(TMPDEB)/usr/share/doc/immich-server \
+	         $(TMPDEB)/usr/share/doc/immich-web-data \
+	         $(TMPDEB)/usr/share/doc/immich-cli \
+	         $(TMPDEB)/usr/share/doc/immich-machine-learning
+
+# generate third party licenses info
+# TODO: could also be added to Built:Using or something similar, pnpm has a json output mode that could be parsed
+	pnpm --filter immich --filter plugins licenses list --prod --long | gzip > $(TMPDEB)/usr/share/doc/immich-server/THIRD-PARTY-LICENSES.txt.gz
+	pnpm --filter @immich/sdk --filter immich-web licenses list --prod --long | gzip > $(TMPDEB)/usr/share/doc/immich-cli/THIRD-PARTY-LICENSES.txt.gz
+	pnpm --filter @immich/sdk --filter @immich/cli licenses list --prod --long | gzip > $(TMPDEB)/usr/share/doc/immich-web-data/THIRD-PARTY-LICENSES.txt.gz
+
+# generate build.env since immich version info is not built-in
+	debian/helpers/generate-build-metadata.sh > $(TMPDEB)/usr/share/doc/immich-server/build.env
+	cp $(TMPDEB)/usr/share/doc/immich-server/build.env $(TMPDEB)/usr/share/doc/immich-cli/build.env
+	cp $(TMPDEB)/usr/share/doc/immich-server/build.env $(TMPDEB)/usr/share/doc/immich-machine-learning/build.env
+
+override_dh_prep:
+	rm -rf $(TMPDEB)/build
+	dh_prep -X $(TMPDEB)
+
+override_dh_strip:
+	dh_strip -a -X node_modules/bcrypt/prebuilds -X $(PNPMSTORE)
+
+override_dh_shlibdeps:
+	dh_shlibdeps -a -X node_modules/bcrypt/prebuilds -X $(PNPMSTORE) -- --ignore-missing-info
+
+override_dh_installman:
+	mkdir -p $(TMPDEB)/man/immich-cli
+	help2man $(TMPDEB)/var/lib/immich/cli/bin/immich -n "Command line interface for Immich" --no-info --no-discard-stderr > $(TMPDEB)/man/immich-cli/immich.1
+	ls -1 -d $(TMPDEB)/man/immich-cli/* > "debian/immich-cli.manpages"
+	dh_installman

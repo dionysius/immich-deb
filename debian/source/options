@@ -1,0 +1,2 @@
+# Don't export non-debian files
+extend-diff-ignore = "(^|/)(.github|LICENSE|README|signing-key)"

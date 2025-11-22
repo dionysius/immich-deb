@@ -1,0 +1,6 @@
+machine-learning/README.md var/lib/immich/machine-learning
+machine-learning/bin/uv var/lib/immich/machine-learning/bin
+machine-learning/immich_ml var/lib/immich/machine-learning
+machine-learning/pyproject.toml var/lib/immich/machine-learning
+machine-learning/uv.lock var/lib/immich/machine-learning
+usr/share/doc/immich-machine-learning

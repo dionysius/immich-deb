@@ -1,0 +1,23 @@
+[Unit]
+Description=immich machine-learning server
+Documentation=https://github.com/immich-app/immich
+After=network.target
+
+[Service]
+# The user/group immich machine-learning server is run under
+User=immich
+Group=immich
+# The location of the env file for configuration
+EnvironmentFile=/etc/default/immich-machine-learning
+# build info
+EnvironmentFile=/usr/share/doc/immich-machine-learning/build.env
+# Start the server
+# TODO: venv?
+ExecStart=/var/lib/immich/machine-learning/bin/uv run --extra $DEVICE -m immich_ml
+# Set the working directory
+WorkingDirectory=/var/lib/immich/machine-learning
+# Ensure the service has read/write access to the cache directories
+ReadWritePaths=/var/cache/immich
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,2 @@
+var/cache/immich
+var/lib/immich/machine-learning/.local

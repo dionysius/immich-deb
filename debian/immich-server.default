@@ -1,0 +1,120 @@
+### immich server configuration environment file ###
+# This file is parsed by systemd as EnvironmentFile for the immich-server service.
+# Be aware that this is a dockerless installation, so no settings related to
+# docker or docker compose from the official documentation apply here.
+# Environment variables below are derived from https://docs.immich.app/install/environment-variables/
+
+### General settings ###
+# Timezone should be set to a TZ identifier from this list: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List
+# TZ is used by exiftool as a fallback in case the timezone cannot be determined
+TZ=Etc/UTC
+# Environment (production, development)
+IMMICH_ENV=production
+# Log level (verbose, debug, log, warn, error)
+IMMICH_LOG_LEVEL=log
+# Media location directory
+IMMICH_MEDIA_LOCATION=/var/lib/immich/data
+# Path to config file
+#IMMICH_CONFIG_FILE=
+# Set to true to disable color-coded log output
+#NO_COLOR=false
+# Number of cores available to the Immich server (autodetected if unset)
+#CPU_CORES=
+# Port for the OTEL metrics
+#IMMICH_API_METRICS_PORT=8081
+# Port for the OTEL metrics
+#IMMICH_MICROSERVICES_METRICS_PORT=8082
+# When true, generate thumbnails for invalid images
+#IMMICH_PROCESS_INVALID_IMAGES=
+# List of comma-separated IPs set as trusted proxies
+#IMMICH_TRUSTED_PROXIES=
+# See System Integrity: https://docs.immich.app/administration/system-integrity/
+#IMMICH_IGNORE_MOUNT_CHECK_ERRORS=
+# Path prefix to additional resources (plugins, geo-data, web-data)
+IMMICH_BUILD_DATA=/usr/share/immich/build
+
+### Listener settings ###
+# Listening host
+IMMICH_HOST=127.0.0.1
+# Listening port
+IMMICH_PORT=2283
+
+### Machine learning settings ###
+# Unfortunately there are no options to define the address of the default
+# machine learning server and you have to set it in the immich admin section.
+# Please read: https://docs.immich.app/guides/remote-machine-learning/
+# For a local machine learning server define as URL: http://localhost:3003
+
+### Worker settings ###
+# Additional info: https://docs.immich.app/administration/jobs-workers/
+# Only run these workers
+#IMMICH_WORKERS_INCLUDE=
+# Do not run these workers. Matches against default workers,
+# or IMMICH_WORKERS_INCLUDE if specified
+#IMMICH_WORKERS_EXCLUDE=
+
+### Database settings ###
+# Even when you use a localhost postgres server treat it as a standalone
+# please read: https://docs.immich.app/administration/postgres-standalone/
+# DB_URL must be in the format 'postgresql://immichdbusername:immichdbpassword@postgreshost:postgresport/immichdatabasename'.
+# You can require SSL by adding ?sslmode=require to the end of the DB_URL.
+# When DB_URL is defined, the DB_HOSTNAME, DB_PORT, DB_USERNAME, DB_PASSWORD
+# and DB_DATABASE_NAME database variables are ignored.
+# Database URL
+#DB_URL=
+# Database host
+DB_HOSTNAME=localhost
+# Database port
+DB_PORT=5432
+# Database user
+DB_USERNAME=immich
+# Database password
+DB_PASSWORD=myimmichpassword
+# Database name
+DB_DATABASE_NAME=immich
+# Database SSL mode (one of [disable, allow, prefer, require, verify-full])
+#DB_SSL_MODE=
+# Database vector extension (one of [vectorchord, pgvector, pgvecto.rs])
+# If not provided, the appropriate extension to use is auto-detected at
+# startup by introspecting the database.
+#DB_VECTOR_EXTENSION=
+# Whether to skip running migrations on startup (one of [true, false])
+#DB_SKIP_MIGRATIONS=false
+
+### Redis settings ###
+# REDIS_URL must start with ioredis:// and then include a base64 encoded JSON
+# string for the configuration.
+# When REDIS_URL or REDIS_SOCKET are defined, the REDIS_HOSTNAME, REDIS_PORT,
+# REDIS_USERNAME, REDIS_PASSWORD, and REDIS_DBINDEX variables are ignored.
+# Redis URL
+#REDIS_URL=
+# Redis socket
+#REDIS_SOCKET=
+# Redis host
+REDIS_HOSTNAME=localhost
+# Redis port
+REDIS_PORT=6379
+# Redis username
+REDIS_USERNAME=
+# Redis password
+REDIS_PASSWORD=
+# Redis DB index
+REDIS_DBINDEX=0
+
+### Prometheus settings ###
+# Collect these telemetries. List of host, api, io, repo, job.
+# Note: You can also specify all to enable all
+IMMICH_TELEMETRY_INCLUDE=
+# Do not collect these telemetries. List of host, api, io, repo, job
+IMMICH_TELEMETRY_EXCLUDE=
+
+### NodeJS settings ###
+# More info: https://nodejs.org/api/cli.html#environment-variables_1
+# Customize the NodeJS runtime environment
+NODE_ENV=production
+#NODE_OPTIONS=
+
+### Other settings ###
+# Since this file exposes environment variables to the immich server service,
+# any variable customization for modules can also be set here. E.g.
+#UV_THREADPOOL_SIZE=
