@@ -40,15 +40,29 @@ The services should be up `active (running)`, you can check the status with:
 ```bash
 systemctl status immich-server.service
 systemctl status immich-machine-learning.service
+# or to see whats wrong (scroll down)
+journalctl -u immich-server.service
+journalctl -u immich-machine-learning.service
 ```
 
-If this immich installation is on your local machine you can now navigate to `http://localhost:2283` in your browser. If you need to access it from remote, find the entry and update it to: (Warning! This will allow immich to be accessed from your network)
+If this immich installation is on your local machine you can now navigate to `http://localhost:2283` in your browser.
+
+To access immich from other devices on your network, update the host setting: (Warning! This will allow immich to be accessed from your entire network)
 
 ```env
 IMMICH_HOST=0.0.0.0
 ```
 
-And restart `immich-server.service` again. Check the status of it again and if running you can now head in your browser to `http://<ip-of-your-system>:2283` and immich web ui should show up.
+Restart the service and verify it's running:
+
+```bash
+systemctl restart immich-server.service
+systemctl status immich-server.service
+```
+
+You can now navigate to `http://<ip-of-your-system>:2283` from any device on your network and the immich web UI should appear.
+
+Finally, check the machine-learning section in the server settings for instructions on how to connect the machine-learning server.
 
 ## Advanced configuration
 
