@@ -14,14 +14,49 @@ Quick all-in-one installation commands:
 sudo apt-get install curl
 curl -fsSL https://deb.nodesource.com/setup_22.x | sudo bash -
 curl -fsSL https://packagecloud.io/install/repositories/dionysius/immich/script.deb.sh | sudo bash -
-apt-get install immich
+sudo apt-get install immich
 ```
 
 After installation please read **thouroughly** through the config files containing plentyful of comments and links in `/etc/immich`. You mainly need to setup credentials for between the services, adjust the listener address, and customize the services to your needs. The directory where immich will store your media by default is `/var/lib/immich/data`. Remember to keep good security and backup hygiene.
 
-You can configure everything related to how the services are run through these enviroment files. Apt will notify during upgrade if it detects manual changes. Any changes to systemd units should be made with `systemctl edit <unit file>`.
+Quick setup of a postgresql user, the printed password should be set in the immich-server database settings. (Warning! This will create a superuser, but this way immich can initialize the pgvector extension and it can later make backups for you.)
+
+```bash
+ password=$(openssl rand -base64 32)
+ echo "generated password is: ${password}"
+ echo "create role immich with login superuser password '$password';" | sudo -u postgres psql
+ echo "create database immich;" | sudo -u postgres psql
+ echo "grant all privileges on database immich to immich;" | sudo -u postgres psql
+```
+
+After you have set the credentials in the database settings, restart the server with:
+
+```bash
+systemctl restart immich-server.service
+```
+
+The services should be up `active (running)`, you can check the status with:
+
+```bash
+systemctl status immich-server.service
+systemctl status immich-machine-learning.service
+```
+
+If this immich installation is on your local machine you can now navigate to `http://localhost:2283` in your browser. If you need to access it from remote, find the entry and update it to: (Warning! This will allow immich to be accessed from your network)
+
+```env
+IMMICH_HOST=0.0.0.0
+```
+
+And restart `immich-server.service` again. Check the status of it again and if running you can now head in your browser to `http://<ip-of-your-system>:2283` and immich web ui should show up.
+
+## Advanced configuration
+
+You can configure everything related to how the services are run through these enviroment files. Apt will notify during upgrade if it detects changes. Any changes to systemd units should be made with `systemctl edit <unit file>`. Remember to be sure what each setting you change does, keep your system safe.
 
 While the goal is that those packages bring everything you need, the machine-learning server currently runs with [`uv`](https://docs.astral.sh/uv/) at runtime to download python (if needed) and dependencies.
+
+...
 
 ## Build source package
 
