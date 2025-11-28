@@ -1,3 +1,10 @@
+immich (2.3.1-0alpha2) unstable; urgency=medium
+
+  * restart services on failure, set umask
+  * quick setup documentation in readme
+
+ -- dionysius <dragon.dionysius@gmail.com>  Sat, 29 Nov 2025 00:16:00 +0100
+
 immich (2.3.1-0alpha1) unstable; urgency=medium
 
   * init
