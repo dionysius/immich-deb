@@ -7,6 +7,8 @@ After=network.target
 # The user/group immich machine-learning server is run under
 User=immich
 Group=immich
+# Any files created are only owned by user and group immich
+UMask=0007
 # The location of the env file for configuration
 EnvironmentFile=/etc/default/immich-machine-learning
 # build info
@@ -18,6 +20,8 @@ ExecStart=/var/lib/immich/machine-learning/bin/uv run --extra $DEVICE -m immich_
 WorkingDirectory=/var/lib/immich/machine-learning
 # Ensure the service has read/write access to the cache directories
 ReadWritePaths=/var/cache/immich
+# Restart on failure
+Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target

@@ -25,6 +25,8 @@ After=network.target
 # The user/group immich server is run under
 User=immich
 Group=immich
+# Any files created are only owned by user and group immich
+UMask=0007
 # The location of the env file for configuration
 EnvironmentFile=/etc/default/immich-server
 # build info
@@ -35,6 +37,8 @@ ExecStart=/bin/bash -c 'PATH=/usr/lib/jellyfin-ffmpeg:$PATH exec node dist/main 
 WorkingDirectory=/var/lib/immich/server
 # Ensure the service has read/write access to the data directory
 ReadWritePaths=/var/lib/immich/data
+# Restart on failure
+Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target
