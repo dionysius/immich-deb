@@ -1,3 +1,10 @@
+immich (2.3.1-0alpha3) unstable; urgency=medium
+
+  * improve wording regarding host setting, add machine-learning note
+  * fix available environment variables, add server to machine-learning related and plugins variables
+
+ -- dionysius <dragon.dionysius@gmail.com>  Sat, 29 Nov 2025 07:36:35 +0100
+
 immich (2.3.1-0alpha2) unstable; urgency=medium
 
   * restart services on failure, set umask
