@@ -18,8 +18,6 @@ IMMICH_MEDIA_LOCATION=/var/lib/immich/data
 #IMMICH_CONFIG_FILE=
 # Set to true to disable color-coded log output
 #NO_COLOR=false
-# Number of cores available to the Immich server (autodetected if unset)
-#CPU_CORES=
 # Port for the OTEL metrics
 #IMMICH_API_METRICS_PORT=8081
 # Port for the OTEL metrics
@@ -40,10 +38,16 @@ IMMICH_HOST=127.0.0.1
 IMMICH_PORT=2283
 
 ### Machine learning settings ###
-# Unfortunately there are no options to define the address of the default
-# machine learning server and you have to set it in the immich admin section.
+# Treat the machine learning server as remote, even when running on localhost.
+# Be aware that once machine learning settings are saved in the admin web UI
+# these environment variables are ignored.
 # Please read: https://docs.immich.app/guides/remote-machine-learning/
-# For a local machine learning server define as URL: http://localhost:3003
+# Enable or disable machine learning features
+IMMICH_MACHINE_LEARNING_ENABLED=true
+# URL of the machine learning server
+IMMICH_MACHINE_LEARNING_URL=http://localhost:3003
+# Timeout in milliseconds for pinging the machine learning server (deprecated?)
+#IMMICH_MACHINE_LEARNING_PING_TIMEOUT=2000
 
 ### Worker settings ###
 # Additional info: https://docs.immich.app/administration/jobs-workers/
@@ -53,8 +57,14 @@ IMMICH_PORT=2283
 # or IMMICH_WORKERS_INCLUDE if specified
 #IMMICH_WORKERS_EXCLUDE=
 
+### Plugin settings ###
+# Enable or disable the plugins feature
+IMMICH_PLUGINS_ENABLED=true
+# Absolute path to the folder where plugins are installed
+IMMICH_PLUGINS_INSTALL_FOLDER=/var/lib/immich/data/plugins
+
 ### Database settings ###
-# Even when you use a localhost postgres server treat it as a standalone
+# Treat the postgres server as standalone, even when running on localhost.
 # please read: https://docs.immich.app/administration/postgres-standalone/
 # DB_URL must be in the format 'postgresql://immichdbusername:immichdbpassword@postgreshost:postgresport/immichdatabasename'.
 # You can require SSL by adding ?sslmode=require to the end of the DB_URL.

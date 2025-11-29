@@ -62,8 +62,6 @@ systemctl status immich-server.service
 
 You can now navigate to `http://<ip-of-your-system>:2283` from any device on your network and the immich web UI should appear.
 
-Finally, check the machine-learning section in the server settings for instructions on how to connect the machine-learning server.
-
 ## Advanced configuration
 
 You can configure everything related to how the services are run through these enviroment files. Apt will notify during upgrade if it detects changes. Any changes to systemd units should be made with `systemctl edit <unit file>`. Remember to be sure what each setting you change does, keep your system safe.
@@ -95,11 +93,6 @@ This debian source package builds [immich](https://github.com/immich-app/immich)
 
 ## TODOs
 
-- more requirements, more current libraries needed?
-- hardware-acceleration tests, wiki
-- geo-data licence CC-by, make it self-updateable?
-- export machine-learning dependencies licences
-- preinstall python packages. Understand and fix issues with shlibs.
 - automatic testing
 - describe predefined dependency pgvector, upgrade to vectorcord possible
 
