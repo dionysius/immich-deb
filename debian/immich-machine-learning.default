@@ -19,12 +19,10 @@ MACHINE_LEARNING_CACHE_FOLDER=/var/cache/immich
 TRANSFORMERS_CACHE=/var/cache/immich
 
 ### Listener settings ###
-# These environment variables are not official, made available by a patch of
-# this debian package. May be changed to official ones once available.
 # Listening host
-MACHINE_LEARNING_HOST=127.0.0.1
+IMMICH_HOST=127.0.0.1
 # Listening port
-MACHINE_LEARNING_PORT=3003
+IMMICH_PORT=3003
 
 ### Machine Learning settings ###
 # Additional machine learning parameters can be tuned from the admin UI.
