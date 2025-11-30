@@ -92,18 +92,23 @@ MACHINE_LEARNING_PORT=3003
 # the service is run with uv. If possible we'd remove this in the future but
 # is unlikely with all the requirements including which python version is run.
 # more info: https://github.com/immich-app/immich/issues/15038
-# uv will use the installed python automatically if in the right version
+# To avoid redownloading of newer python releases without a way to clean up it
+# is set to a specific release: https://github.com/astral-sh/uv/issues/15805
 # more options: https://docs.astral.sh/uv/reference/environment/#environment-variables
+# folders allowed to write
 UV_CACHE_DIR=.local/uv-cache
-UV_COMPILE_BYTECODE=true
 UV_PROJECT_ENVIRONMENT=.local/venv
+UV_PYTHON_INSTALL_DIR=.local/uv-python
+# general settings
+UV_COMPILE_BYTECODE=true
 UV_FROZEN=true
 UV_NO_DEV=true
 UV_NO_EDITABLE=true
 UV_NO_PROGRESS=true
-UV_PYTHON=3.12.3
-UV_PYTHON_INSTALL_DIR=.local/uv-python
 UV_REQUIRE_HASHES=true
+# managed python
+UV_PYTHON=3.12.12
+UV_PYTHON_PREFERENCE=only-managed
 
 ### Other settings ###
 # Since this file exposes environment variables to the immich machine learning
