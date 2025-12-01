@@ -46,8 +46,6 @@ IMMICH_PORT=2283
 IMMICH_MACHINE_LEARNING_ENABLED=true
 # URL of the machine learning server
 IMMICH_MACHINE_LEARNING_URL=http://localhost:3003
-# Timeout in milliseconds for pinging the machine learning server (deprecated?)
-#IMMICH_MACHINE_LEARNING_PING_TIMEOUT=2000
 
 ### Worker settings ###
 # Additional info: https://docs.immich.app/administration/jobs-workers/
@@ -58,6 +56,7 @@ IMMICH_MACHINE_LEARNING_URL=http://localhost:3003
 #IMMICH_WORKERS_EXCLUDE=
 
 ### Plugin settings ###
+# Not documented officially, api endpoint is alpha.
 # Enable or disable the plugins feature
 IMMICH_PLUGINS_ENABLED=true
 # Absolute path to the folder where plugins are installed

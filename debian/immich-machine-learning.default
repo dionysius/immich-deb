@@ -58,6 +58,10 @@ IMMICH_PORT=3003
 # Comma-separated list of (detection) facial recognition model(s) to preload
 # and cache
 #MACHINE_LEARNING_PRELOAD__FACIAL_RECOGNITION__DETECTION=
+# Not documented officially
+#MACHINE_LEARNING_PRELOAD__OCR__RECOGNITION=
+# Not documented officially
+#MACHINE_LEARNING_PRELOAD__OCR__DETECTION=
 # Enable ARM-NN hardware acceleration if supported
 #MACHINE_LEARNING_ANN=True
 # Execute operations in FP16 precision: increasing speed, reducing precision
@@ -75,6 +79,8 @@ IMMICH_PORT=3003
 # Set the maximum number of boxes that will be processed at once by the OCR
 # model
 #MACHINE_LEARNING_MAX_BATCH_SIZE__OCR=6
+# Not documented officially
+#MACHINE_LEARNING_MAX_BATCH_SIZE__TEXT_RECOGNITION=
 # Enable RKNN hardware acceleration if supported
 #MACHINE_LEARNING_RKNN=True
 # How many threads of RKNN runtime should be spun up while inferencing
