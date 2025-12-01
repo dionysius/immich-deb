@@ -29,7 +29,7 @@ IMMICH_MEDIA_LOCATION=/var/lib/immich/data
 # See System Integrity: https://docs.immich.app/administration/system-integrity/
 #IMMICH_IGNORE_MOUNT_CHECK_ERRORS=
 # Path prefix to additional resources (plugins, geo-data, web-data)
-IMMICH_BUILD_DATA=/usr/share/immich/build
+IMMICH_BUILD_DATA=/var/lib/immich/.build
 
 ### Listener settings ###
 # Listening host
