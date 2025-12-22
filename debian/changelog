@@ -1,5 +1,6 @@
-immich (2.4.1-0alpha2) unstable; urgency=medium
+immich (2.4.1-0alpha3) unstable; urgency=medium
 
+  * use correct ubuntu dist in obs
   * use libvips from obs
   * update to 2.4.1
 
