@@ -1,3 +1,9 @@
+immich (2.4.1-0alpha1) unstable; urgency=medium
+
+  * update to 2.4.1
+
+ -- dionysius <dragon.dionysius@gmail.com>  Mon, 22 Dec 2025 15:41:52 +0100
+
 immich (2.3.1-0alpha4) unstable; urgency=medium
 
   * improve wording regarding host setting, add machine-learning note
