@@ -1,5 +1,6 @@
-immich (2.4.1-0alpha1) unstable; urgency=medium
+immich (2.4.1-0alpha2) unstable; urgency=medium
 
+  * use libvips from obs
   * update to 2.4.1
 
  -- dionysius <dragon.dionysius@gmail.com>  Mon, 22 Dec 2025 15:41:52 +0100
