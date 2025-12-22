@@ -22,8 +22,10 @@ jobs:
         curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
         apt-get install -y nodejs
         curl -fsSL https://build.opensuse.org/projects/home:dionysius:immich/signing_keys/download?kind=gpg | sudo gpg --dearmor -o /etc/apt/keyrings/obs-dionysius.key
-        echo "deb [signed-by=/etc/apt/keyrings/obs-dionysius.key] https://download.opensuse.org/repositories/home:/dionysius:/immich/Debian_13/ /" | sudo tee /etc/apt/sources.list.d/obs-dionysius.list
-        sudo apt update
+        dist="$(lsb_release -si)_$(lsb_release -sr)"
+        [[ "$dist" == Ubuntu* ]] && dist="x${dist}"
+        echo "deb [signed-by=/etc/apt/keyrings/obs-dionysius.key] https://download.opensuse.org/repositories/home:/dionysius:/immich/$dist/ /" | sudo tee /etc/apt/sources.list.d/obs-dionysius.list
+        apt-get update
     secrets:
       GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
   release:
