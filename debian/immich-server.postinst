@@ -3,7 +3,7 @@ set -e
 
 if [ "$1" = "configure" ]; then
   adduser --system --group --quiet --no-create-home --home /var/lib/immich immich >/dev/null || true
-  chown immich:immich /var/lib/immich/data
+  chown -R immich:immich /var/lib/immich
 fi
 
 #DEBHELPER#
