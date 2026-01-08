@@ -1,10 +1,10 @@
 # immich deb packages
 
-Easy to install and highly configurable debian packages for running [immich](https://github.com/immich-app/immich) on your system natively without docker. It supports a simple all-in-one package as well as that any server componenent can be installed and run on different hosts. Out of the box it can be installed and built on Debian stable and latest Ubuntu LTS.
+Easy to install and highly configurable debian packages for running [immich](https://github.com/immich-app/immich) on your system natively without docker. It supports a simple all-in-one package as well as that any server componenent can be installed separately. Out of the box it can be installed and built on Debian stable and latest Ubuntu LTS.
 
 ## Installation
 
-Easiest to install is using the the apt repository on [packagecloud](https://packagecloud.io/dionysius/immich) (only `amd64` for now). For the all-in-one package install the `immich` which will install the main server, the machine-learning server, postgres, redis and all required dependencies. For a customized installation use `immich-server`, `immich-machine-learning`, `immich-db-reqs`, `redis-server` and `immich-cli` in any combination. immich currently requires a newer nodejs version than is available so you will need the apt repository from [nodesource](https://downloads.nodesource.com) (for `immich-server` and `immich-cli`), don't worry you'll get notified if dependency requirements can't be fullfilled.
+Easiest to install is using the the apt repository on [apt.crunchy.run](https://apt.crunchy.run/immich). For the all-in-one package install the `immich` package which will install all immich components and their required dependencies. For a customized installation use `immich-server`, `immich-machine-learning`, `immich-db-reqs`, `redis-server` and `immich-cli` in any combination. immich currently requires a newer nodejs version than is available so you will need the apt repository from [nodesource](https://downloads.nodesource.com) (for `immich-server` and `immich-cli`), don't worry you'll get notified by apt if dependency requirements can't be fullfilled.
 
 Alternatively you can download the prebuilt packages for manual installation from the [releases section](https://github.com/dionysius/immich-deb/releases) and you can verify the signatures with this [signing-key](signing-key.pub). They are automatically built in [Github Actions](https://github.com/dionysius/immich-deb/actions) for the latest Ubuntu LTS and Debian stable (only `amd64` for now).
 
@@ -13,13 +13,13 @@ Quick all-in-one installation commands:
 ```bash
 sudo apt-get install curl
 curl -fsSL https://deb.nodesource.com/setup_22.x | sudo bash -
-curl -fsSL https://packagecloud.io/install/repositories/dionysius/immich/script.deb.sh | sudo bash -
+curl -fsSL curl -fsSL https://apt.crunchy.run/immich/install.sh | sudo bash -
 sudo apt-get install immich
 ```
 
 After installation please read **thouroughly** through the config files containing plentyful of comments and links in `/etc/immich`. You mainly need to setup credentials for between the services, adjust the listener address, and customize the services to your needs. The directory where immich will store your media by default is `/var/lib/immich/data`. Remember to keep good security and backup hygiene.
 
-Quick setup of a postgresql user, the printed password should be set in the immich-server database settings. (Warning! This will create a superuser, but this way immich can initialize the pgvector extension and it can later make backups for you.)
+Quick setup of a postgresql user, the printed password should be set in the immich-server database settings: (Warning! This will create a superuser, but this way immich can initialize the pgvector extension and it can make backups for you.)
 
 ```bash
  password=$(openssl rand -base64 32)
