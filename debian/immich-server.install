@@ -1,9 +1,9 @@
 plugins/dist usr/share/immich/plugins
 plugins/manifest.json usr/share/immich/plugins
+usr/lib/immich/server/.pnpm-store
+usr/lib/immich/server/dist
+usr/lib/immich/server/node_modules
+usr/lib/immich/server/package.json
+usr/lib/immich/server/pnpm-lock.yaml
+usr/lib/immich/server/resources
 usr/share/doc/immich-server
-var/lib/immich/server/.pnpm-store
-var/lib/immich/server/dist
-var/lib/immich/server/node_modules
-var/lib/immich/server/package.json
-var/lib/immich/server/pnpm-lock.yaml
-var/lib/immich/server/resources

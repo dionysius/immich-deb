@@ -15,9 +15,9 @@ EnvironmentFile=/etc/default/immich-machine-learning
 EnvironmentFile=/usr/share/doc/immich-machine-learning/build.env
 # Start the server
 # TODO: venv?
-ExecStart=/var/lib/immich/machine-learning/bin/uv run --extra $DEVICE -m immich_ml
+ExecStart=/usr/lib/immich/machine-learning/bin/uv run --extra $DEVICE -m immich_ml
 # Set the working directory
-WorkingDirectory=/var/lib/immich/machine-learning
+WorkingDirectory=/usr/lib/immich/machine-learning
 # Ensure the service has read/write access to the cache directories
 ReadWritePaths=/var/cache/immich
 # Restart on failure

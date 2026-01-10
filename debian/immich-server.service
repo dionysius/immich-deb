@@ -34,7 +34,7 @@ EnvironmentFile=/usr/share/doc/immich-server/build.env
 # Start the server
 ExecStart=/bin/bash -c 'PATH=/usr/lib/jellyfin-ffmpeg:$PATH exec node dist/main $@'
 # Set the working directory
-WorkingDirectory=/var/lib/immich/server
+WorkingDirectory=/usr/lib/immich/server
 # Ensure the service has read/write access to the data directory
 ReadWritePaths=/var/lib/immich/data
 # Restart on failure

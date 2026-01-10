@@ -4,5 +4,5 @@ set -e
 #DEBHELPER#
 
 if [ "$1" = "purge" ]; then
-  rm -rf /var/cache/immich /var/lib/immich/machine-learning/.local || true
+  rm -rf /var/cache/immich || true
 fi

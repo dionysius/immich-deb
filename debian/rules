@@ -103,14 +103,14 @@ override_dh_auto_configure:
 override_dh_auto_build:
 # we may need to add --cpu and --os to pnpm install and deploy commands for package cross-building
 	SHARP_IGNORE_GLOBAL_LIBVIPS=true pnpm --filter immich --frozen-lockfile build
-	SHARP_FORCE_GLOBAL_LIBVIPS=true pnpm --filter immich --frozen-lockfile --prod --no-optional deploy $(TMPDEB)/var/lib/immich/server
+	SHARP_FORCE_GLOBAL_LIBVIPS=true pnpm --filter immich --frozen-lockfile --prod --no-optional deploy $(TMPDEB)/usr/lib/immich/server
 
 	pnpm --filter @immich/sdk --filter immich-web --frozen-lockfile install
 	SHARP_IGNORE_GLOBAL_LIBVIPS=true pnpm --filter @immich/sdk --filter immich-web --frozen-lockfile build
 
 	pnpm --filter @immich/sdk --filter @immich/cli --frozen-lockfile install
 	pnpm --filter @immich/sdk --filter @immich/cli --frozen-lockfile build
-	pnpm --filter @immich/cli --frozen-lockfile --prod --no-optional deploy $(TMPDEB)/var/lib/immich/cli
+	pnpm --filter @immich/cli --frozen-lockfile --prod --no-optional deploy $(TMPDEB)/usr/lib/immich/cli
 
 	pnpm --filter plugins --frozen-lockfile install
 	pnpm --filter plugins --frozen-lockfile build
@@ -146,6 +146,6 @@ override_dh_shlibdeps:
 
 override_dh_installman:
 	mkdir -p $(TMPDEB)/man/immich-cli
-	help2man $(TMPDEB)/var/lib/immich/cli/bin/immich -n "Command line interface for Immich" --no-info --no-discard-stderr > $(TMPDEB)/man/immich-cli/immich.1
+	help2man $(TMPDEB)/usr/lib/immich/cli/bin/immich -n "Command line interface for Immich" --no-info --no-discard-stderr > $(TMPDEB)/man/immich-cli/immich.1
 	ls -1 -d $(TMPDEB)/man/immich-cli/* > "debian/immich-cli.manpages"
 	dh_installman

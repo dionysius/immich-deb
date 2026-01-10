@@ -29,7 +29,7 @@ IMMICH_MEDIA_LOCATION=/var/lib/immich/data
 # See System Integrity: https://docs.immich.app/administration/system-integrity/
 #IMMICH_IGNORE_MOUNT_CHECK_ERRORS=
 # Path prefix to additional resources (plugins, geo-data, web-data)
-IMMICH_BUILD_DATA=/var/lib/immich/.build
+IMMICH_BUILD_DATA=/usr/lib/immich/.build
 
 ### Listener settings ###
 # Listening host
@@ -60,7 +60,7 @@ IMMICH_MACHINE_LEARNING_URL=http://localhost:3003
 # Enable or disable the plugins feature
 IMMICH_PLUGINS_ENABLED=true
 # Absolute path to the folder where plugins are installed
-IMMICH_PLUGINS_INSTALL_FOLDER=/var/lib/immich/data/plugins
+IMMICH_PLUGINS_INSTALL_FOLDER=/var/lib/immich/plugins
 
 ### Database settings ###
 # Treat the postgres server as standalone, even when running on localhost.

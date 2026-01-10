@@ -1,7 +1,7 @@
-var/lib/immich/server/.nvmrc
-var/lib/immich/server/.prettier*
-var/lib/immich/server/Dockerfile*
-var/lib/immich/server/bin
-var/lib/immich/server/mise.toml
-var/lib/immich/server/nest-cli.json
-var/lib/immich/server/test
+usr/lib/immich/server/.nvmrc
+usr/lib/immich/server/.prettier*
+usr/lib/immich/server/Dockerfile*
+usr/lib/immich/server/bin
+usr/lib/immich/server/mise.toml
+usr/lib/immich/server/nest-cli.json
+usr/lib/immich/server/test

@@ -34,7 +34,7 @@ Description: Self-hosted photo and video management solution - All-In-One
  without sacrificing your privacy.
  .
  This metapackage installs all immich server components along with the
- PostgreSQL database with pgvector extension and Redis server.
+ PostgreSQL database including extensions and Redis server.
 
 Package: immich-server
 Architecture: any
@@ -96,7 +96,8 @@ Description: Self-hosted photo and video management solution - geo data
  helps you browse, search and organize your photos and videos with ease,
  without sacrificing your privacy.
  .
- This package contains geo data resources used by immich.
+ This package contains geo data resources used by immich. Contains data by
+ GeoNames CC-BY geonames.org and made with Natural Earth.
 
 Package: immich-cli
 Architecture: any
@@ -131,9 +132,10 @@ Package: immich-db-reqs
 Architecture: all
 Pre-Depends: ${misc:Pre-Depends},
 Depends: postgresql,
-         postgresql-pgvector | postgresql-18-pgvector | postgresql-17-pgvector | postgresql-16-pgvector | postgresql-15-pgvector | postgresql-14-pgvector,
+         postgresql-pgvector | postgresql-18-pgvector | postgresql-17-pgvector | postgresql-16-pgvector,
          ${misc:Depends},
-Recommends: ${misc:Recommends},
+Recommends: postgresql-vchord | postgresql-18-vchord | postgresql-17-vchord | postgresql-16-vchord,
+            ${misc:Recommends},
 Built-Using: ${misc:Built-Using},
 Description: Self-hosted photo and video management solution - db requirements
  Easily back up, organize, and manage your photos on your own server. immich

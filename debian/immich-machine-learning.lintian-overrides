@@ -1,2 +1,2 @@
 # we ship uv for now
-missing-dependency-on-libc needed by var/lib/immich/machine-learning/bin/uv
+missing-dependency-on-libc needed by usr/lib/immich/machine-learning/bin/uv

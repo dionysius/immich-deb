@@ -100,9 +100,9 @@ IMMICH_PORT=3003
 # is set to a specific release: https://github.com/astral-sh/uv/issues/15805
 # more options: https://docs.astral.sh/uv/reference/environment/#environment-variables
 # folders allowed to write
-UV_CACHE_DIR=.local/uv-cache
-UV_PROJECT_ENVIRONMENT=.local/venv
-UV_PYTHON_INSTALL_DIR=.local/uv-python
+UV_CACHE_DIR=/var/cache/immich/uv/cache
+UV_PROJECT_ENVIRONMENT=/var/cache/immich/uv/venv
+UV_PYTHON_INSTALL_DIR=/var/cache/immich/uv/python
 # general settings
 UV_COMPILE_BYTECODE=true
 UV_FROZEN=true
@@ -117,4 +117,4 @@ UV_PYTHON_PREFERENCE=only-managed
 ### Other settings ###
 # Since this file exposes environment variables to the immich machine learning
 # service, any variable customization for modules can also be set here.
-MPLCONFIGDIR=.local/matplotlib
+MPLCONFIGDIR=/var/cache/immich/uv/matplotlib
