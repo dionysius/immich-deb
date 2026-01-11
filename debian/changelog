@@ -1,3 +1,11 @@
+immich (2.4.1-0alpha5) unstable; urgency=medium
+
+  * don't start immich-server on install which needs configuration
+  * add dependencies for compilation for uv for immich-machine-learning
+  * installing immich-db-reqs package tries to activate vchord defensively, limited version compatibility
+
+ -- dionysius <dragon.dionysius@gmail.com>  Sun, 11 Jan 2026 16:01:41 +0100
+
 immich (2.4.1-0alpha4) unstable; urgency=medium
 
   * new apt-repository, updated readme
