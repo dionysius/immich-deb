@@ -144,15 +144,14 @@ Description: Self-hosted photo and video management solution - db requirements
  defining those as dependencies.
 
 # https://docs.immich.app/administration/postgres-standalone/#prerequisites -> Prerequisites -> supported versions
+# Defining only upper bounds as you can't define actual dependency range 
 
 Package: immich-db-reqs-16
 Architecture: all
 Pre-Depends: ${misc:Pre-Depends},
 Depends: postgresql-16,
          postgresql-16-pgvector (<< 0.9.0),
-         postgresql-16-pgvector (>= 0.7.0),
          postgresql-16-vchord (<< 0.6.0),
-         postgresql-16-vchord (>= 0.3.0),
          ${misc:Depends},
 Built-Using: ${misc:Built-Using},
 Description: Self-hosted photo and video management solution - db requirements
@@ -168,9 +167,7 @@ Architecture: all
 Pre-Depends: ${misc:Pre-Depends},
 Depends: postgresql-17,
          postgresql-17-pgvector (<< 0.9.0),
-         postgresql-17-pgvector (>= 0.7.0),
          postgresql-17-vchord (<< 0.6.0),
-         postgresql-17-vchord (>= 0.3.0),
          ${misc:Depends},
 Built-Using: ${misc:Built-Using},
 Description: Self-hosted photo and video management solution - db requirements
@@ -186,9 +183,7 @@ Architecture: all
 Pre-Depends: ${misc:Pre-Depends},
 Depends: postgresql-18,
          postgresql-18-pgvector (<< 0.9.0),
-         postgresql-18-pgvector (>= 0.7.0),
          postgresql-18-vchord (<< 0.6.0),
-         postgresql-18-vchord (>= 0.3.0),
          ${misc:Depends},
 Built-Using: ${misc:Built-Using},
 Description: Self-hosted photo and video management solution - db requirements
