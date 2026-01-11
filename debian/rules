@@ -138,6 +138,11 @@ override_dh_prep:
 	rm -rf $(TMPDEB)/build
 	dh_prep -X $(TMPDEB)
 
+# Don't automatically start immich-server on installation - it requires configuration first
+override_dh_installsystemd:
+	dh_installsystemd -pimmich-server --no-start
+	dh_installsystemd -pimmich-machine-learning
+
 override_dh_strip:
 	dh_strip -a -X node_modules/bcrypt/prebuilds -X $(PNPMSTORE)
 

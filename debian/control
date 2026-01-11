@@ -73,7 +73,9 @@ Pre-Depends: ${misc:Pre-Depends},
 #          python3-pydantic-settings,
 #          python3-huggingface-tokenizers, # this is missing
 #          ... and maybe more
-Depends: python3,
+# We compile stuff in uv so need a compiler and other headers
+Depends: g++,
+         libgl-dev,
          ${misc:Depends},
 Recommends: ${misc:Recommends},
 Built-Using: ${misc:Built-Using},
