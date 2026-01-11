@@ -3,23 +3,12 @@ Description=immich main server
 Documentation=https://github.com/immich-app/immich
 After=network.target
 
-# If you use immich machine learning, postgresql or redis locally,
-# you have to add them like the following and uncomment them 
-# by removing the `# ` before it. This makes sure that your 
-# service is started before immich-server ("After") and has 
-# started successfully before starting immich-server ("Requires").
-
-# Machine learning
-# After=immich-machine-learning.service
-# Requires=immich-machine-learning.service
-
-# PostgreSQL
-# After=postgresql.service
-# Requires=postgresql.service
-
-# Redis
-# After=redis.service
-# Requires=redis.service
+# To add dependencies on local services (immich-machine-learning, postgresql, redis),
+# use `systemctl edit immich-server.service` and add the required After=/Requires= directives.
+# Example:
+#   [Unit]
+#   After=immich-machine-learning.service postgresql.service redis.service
+#   Requires=immich-machine-learning.service postgresql.service redis.service
 
 [Service]
 # The user/group immich server is run under
@@ -27,18 +16,34 @@ User=immich
 Group=immich
 # Any files created are only owned by user and group immich
 UMask=0007
+
+# Directories used by the service
+StateDirectory=immich immich/data immich/plugins
+
 # The location of the env file for configuration
 EnvironmentFile=/etc/default/immich-server
 # build info
 EnvironmentFile=/usr/share/doc/immich-server/build.env
+
 # Start the server
 ExecStart=/bin/bash -c 'PATH=/usr/lib/jellyfin-ffmpeg:$PATH exec node dist/main $@'
 # Set the working directory
 WorkingDirectory=/usr/lib/immich/server
-# Ensure the service has read/write access to the data directory
-ReadWritePaths=/var/lib/immich/data
+
 # Restart on failure
 Restart=on-failure
+RestartSec=5s
+
+# Basic security hardening
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectControlGroups=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
 
 [Install]
 WantedBy=multi-user.target

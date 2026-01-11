@@ -3,7 +3,13 @@ set -e
 
 if [ "$1" = "configure" ]; then
   adduser --system --group --quiet --no-create-home --home /var/lib/immich immich >/dev/null || true
-  chown immich:immich /var/cache/immich
+
+  if [ -f /etc/default/immich-machine-learning ]; then
+    if ! dpkg-statoverride --list /etc/default/immich-machine-learning >/dev/null 2>&1; then
+      chown root:immich /etc/default/immich-machine-learning
+      chmod 0640 /etc/default/immich-machine-learning
+    fi
+  fi
 fi
 
 #DEBHELPER#
