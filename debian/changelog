@@ -1,3 +1,16 @@
+immich (2.4.1-0alpha4) unstable; urgency=medium
+
+  * new apt-repository, updated readme
+  * move static files to usr/lib
+  * move all uv runtime dirs to var/cache
+  * external plugins into var/lib outside data
+  * attribute geo-data
+  * more restrict file permissions on config files
+  * use systemd to manage service state and cache dirs
+  * add basic security hardening
+
+ -- dionysius <dragon.dionysius@gmail.com>  Sun, 11 Jan 2026 09:35:51 +0100
+
 immich (2.4.1-0alpha3) unstable; urgency=medium
 
   * use correct ubuntu dist in obs
