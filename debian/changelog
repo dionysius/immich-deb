@@ -1,5 +1,6 @@
-immich (2.4.1-0alpha6) unstable; urgency=medium
+immich (2.4.1-0alpha7) unstable; urgency=medium
 
+  * rename files to install
   * separated db requirement packages for each postgresql version to be able to define specific compatible extension versions
 
  -- dionysius <dragon.dionysius@gmail.com>  Sun, 11 Jan 2026 18:01:27 +0100
