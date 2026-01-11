@@ -1,3 +1,9 @@
+immich (2.4.1-0alpha9) unstable; urgency=medium
+
+  * only upper bounds for db-reqs
+
+ -- dionysius <dragon.dionysius@gmail.com>  Sun, 11 Jan 2026 19:24:21 +0100
+
 immich (2.4.1-0alpha8) unstable; urgency=medium
 
   * also rename in install template
