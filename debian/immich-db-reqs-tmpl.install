@@ -1,1 +1,1 @@
-debian/files/10-immich-db-reqs.conf etc/postgresql/##PSQL_VERSION##/main/conf.d
+debian/install/10-immich-db-reqs.conf etc/postgresql/##PSQL_VERSION##/main/conf.d
