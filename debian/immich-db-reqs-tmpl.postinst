@@ -1,0 +1,15 @@
+#!/bin/sh
+set -e
+
+# add vchord extension to configuration automatically on package install
+if [ "$1" = "configure" ]; then
+  # only on first install (no second argument = not upgrade)
+  if [ -z "$2" ]; then
+    # restart postgresql only if it was running
+    if [ -d /run/systemd/system ]; then
+      systemctl try-restart "postgresql@##PSQL_VERSION##-main.service" || true
+    fi
+  fi
+fi
+
+#DEBHELPER#

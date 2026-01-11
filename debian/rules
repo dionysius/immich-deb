@@ -100,6 +100,9 @@ override_dh_auto_configure:
 	cd $(TMPGEODATA); unzip -o cities500.zip; rm cities500.zip
 	date --iso-8601=seconds | tr -d "\n" > $(TMPGEODATA)/geodata-date.txt
 
+# generate immich-db-reqs-* packaging files for PostgreSQL versions defined in debian/control
+	debian/helpers/generate-db-reqs-packages.sh
+
 override_dh_auto_build:
 # we may need to add --cpu and --os to pnpm install and deploy commands for package cross-building
 	SHARP_IGNORE_GLOBAL_LIBVIPS=true pnpm --filter immich --frozen-lockfile build
