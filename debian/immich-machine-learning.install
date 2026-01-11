@@ -1,3 +1,5 @@
+machine-learning/.uv-cache var/lib/immich/machine-learning
+machine-learning/.venv var/lib/immich/machine-learning
 machine-learning/README.md var/lib/immich/machine-learning
 machine-learning/bin/uv var/lib/immich/machine-learning/bin
 machine-learning/immich_ml var/lib/immich/machine-learning

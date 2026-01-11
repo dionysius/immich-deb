@@ -5,6 +5,15 @@ include /usr/share/dpkg/default.mk
 export DH_VERBOSE = 1
 MAKEFLAGS += --no-print-directory
 
+# By default use your OS nodejs or one provided by nodesource. For development purposes allow the use of node provided by nvm if available.
+# Remove for correct debian policy.
+# I had to make a compatibility to allow `npm` to be provided with help of `nvm` since my distro didn't provide a recent enough version.
+# Using only official apt sources would be cleaner.
+NVM_BIN = $(shell bash -c ". $(HOME)/.nvm/nvm.sh; printenv NVM_BIN" 2>/dev/null)
+ifneq ($(NVM_BIN), "")
+export PATH := $(NVM_BIN):$(PATH)
+endif
+
 # common locations
 TMPDEB = debian/tmp
 TMPBUILD = $(TMPDEB)/build
@@ -38,6 +47,20 @@ BINARYEN_SHA256_aarch64 = d0382de3c189a7cbb9fdda93e2966f4557f6a00f201e2c4937c27c
 UV_VERSION = 0.9.13
 UV_SHA256_x86_64 = c45a44144bf23a2182e143227b4ad0bbe41a2bb7161a637c02e968906af53fd1
 UV_SHA256_aarch64 = c221d04810f873a7aa8bae9aa6ed721e600e56534980df1363952386a4fcdcc5
+
+# uv settings to use (currently only for machine-learning-server)
+# similar settings in the defaults file, changes need to be reflected there
+export DEVICE=cpu
+export UV_CACHE_DIR=.uv-cache
+export UV_COMPILE_BYTECODE=true
+export UV_PROJECT_ENVIRONMENT=.venv
+export UV_FROZEN=true
+# export UV_LINK_MODE=copy # i think we're ok with hardlinks
+export UV_NO_DEV=true
+export UV_NO_EDITABLE=true
+export UV_NO_PROGRESS=true
+export UV_PYTHON=3.12.3
+export UV_REQUIRE_HASHES=true
 
 # steps mostly imitate official docker images, so changes there may need to be reflected here
 # - https://github.com/immich-app/base-images/blob/main/server/Dockerfile
@@ -101,6 +124,7 @@ override_dh_auto_configure:
 	date --iso-8601=seconds | tr -d "\n" > $(TMPGEODATA)/geodata-date.txt
 
 override_dh_auto_build:
+
 # we may need to add --cpu and --os to pnpm install and deploy commands for package cross-building
 	SHARP_IGNORE_GLOBAL_LIBVIPS=true pnpm --filter immich --frozen-lockfile build
 	SHARP_FORCE_GLOBAL_LIBVIPS=true pnpm --filter immich --frozen-lockfile --prod --no-optional deploy $(TMPDEB)/var/lib/immich/server
@@ -115,7 +139,7 @@ override_dh_auto_build:
 	pnpm --filter plugins --frozen-lockfile install
 	pnpm --filter plugins --frozen-lockfile build
 
-# TODO: predownload and prebuild python packages with uv
+	cd machine-learning; ./bin/uv sync --extra $(DEVICE) --no-install-project --active
 
 # additional doc files
 	mkdir -p $(TMPDEB)/usr/share/doc/immich-server \
@@ -141,6 +165,9 @@ override_dh_prep:
 override_dh_strip:
 	dh_strip -a -X node_modules/bcrypt/prebuilds -X $(PNPMSTORE)
 
+override_dh_makeshlibs:
+	dh_makeshlibs -a -X debian/immich-machine-learning/var/lib/immich/machine-learning/.venv/lib/python3.12/site-packages
+
 override_dh_shlibdeps:
 	dh_shlibdeps -a -X node_modules/bcrypt/prebuilds -X $(PNPMSTORE) -- --ignore-missing-info
 
@@ -149,3 +176,9 @@ override_dh_installman:
 	help2man $(TMPDEB)/var/lib/immich/cli/bin/immich -n "Command line interface for Immich" --no-info --no-discard-stderr > $(TMPDEB)/man/immich-cli/immich.1
 	ls -1 -d $(TMPDEB)/man/immich-cli/* > "debian/immich-cli.manpages"
 	dh_installman
+
+# dwz: debian/immich-machine-learning/var/lib/immich/machine-learning/.uv-cache/archive-v0/xJhF3DXwvNBlcqhqFtwtG/uvloop/loop.cpython-312-x86_64-linux-gnu.so: DWARF compression not beneficial
+# dwz: Too few files for multifile optimization
+# basically try your best but don't fail the build (... || :)
+override_dh_dwz:
+	dh_dwz -a -X .cpython-312-$(DEB_BUILD_GNU_CPU)-$(DEB_BUILD_ARCH_OS)-$(DEB_BUILD_ARCH_LIBC).so || :

@@ -1,14 +1,36 @@
 Source: immich
 Section: web
 Priority: optional
-# add binaryen and remove manual download in rules once ubuntu has the package
-# >= 120 in 26.04 LTS, debian trixie is ready - IF this version is sufficient
+# add binaryen and remove manual download in rules once ubuntu has the package >= 120 in 26.04 LTS, debian trixie is ready - if this version is sufficient
+# it's possible that the libs below are not all needed since python packages may link more than what immich actually needs
+# alternatively install required effective libs in machine-learning and disable shlibs checking
 Build-Depends: curl,
                debhelper-compat (= 13),
                gawk,
                help2man,
+#               libavcodec-dev,
+#               libavutil-dev,
+#               libbrotli-dev,
+#               libcrypto++-dev,
+#               libfreetype-dev,
+#               libgcc-14-dev | libgcc-13-dev | libgcc-12-dev,
+#               libgeos-dev,
+#               libgfortran-14-dev | libgfortran-13-dev | libgfortran-12-dev,
+#               libjpeg-dev,
+#               liblzma-dev,
+#               libpng-dev,
+#               libsharpyuv-dev,
+#               libssl-dev,
+#               libswresample-dev,
                libvips-dev (>= 8.17.2),
-               nodejs (>= 22) | npm,
+#               libvpx-dev,
+#               libwebp-dev,
+#               libxau-dev,
+#               libxcb-render0-dev,
+#               libxcb-shm0-dev,
+#               libxcb-util-dev,
+               nodejs (>= 22),
+               npm,
                pkgconf,
                unzip,
 Maintainer: dionysius <dragon.dionysius@gmail.com>
@@ -131,7 +153,7 @@ Package: immich-db-reqs
 Architecture: all
 Pre-Depends: ${misc:Pre-Depends},
 Depends: postgresql,
-         postgresql-pgvector | postgresql-18-pgvector | postgresql-17-pgvector | postgresql-16-pgvector | postgresql-15-pgvector | postgresql-14-pgvector,
+         postgresql-pgvector | postgresql-18-pgvector | postgresql-17-pgvector | postgresql-16-pgvector,
          ${misc:Depends},
 Recommends: ${misc:Recommends},
 Built-Using: ${misc:Built-Using},
@@ -140,5 +162,5 @@ Description: Self-hosted photo and video management solution - db requirements
  helps you browse, search and organize your photos and videos with ease,
  without sacrificing your privacy.
  .
- This metapackage helps installing the required database and extensions by
- defining those as dependencies.
+ This package helps installing the required database and extensions by
+ defining those as dependencies to this metapackage.

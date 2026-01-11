@@ -1,0 +1,177 @@
+
+git \
+autoconf \
+automake \
+libtool \
+libltdl-dev \
+build-essential \
+cmake \
+jq \
+libbrotli-dev \
+libde265-dev \
+libexif-dev \
+libexpat1-dev \
+libglib2.0-dev \
+libgsf-1-dev \
+libmimalloc3 \
+libjpeg62-turbo-dev is just for building libvips; the final image uses jpegli (/usr/local/lib/libjpeg.so.62) built alongside libjxl
+libjpeg62-turbo-dev \
+liblcms2-dev \
+librsvg2-dev \
+libspng-dev \
+meson \
+ninja-build \
+pkg-config \
+wget \
+unzip \
+zlib1g \
+postgresql-client-14 \
+postgresql-client-15 \
+postgresql-client-16 \
+postgresql-client-17 \
+postgresql-client-18 \
+tini \
+make \
+ocl-icd-libopencl1 \
+libopenmpt0 \
+libbluray2 \
+libvpx9 \
+libzvbi0 \
+libmp3lame0 \
+libopus0 \
+libtheora0 \
+libvorbis0a \
+libvorbisenc2 \
+libx264-164 \
+libdav1d-dev \
+libhwy-dev \
+libwebp-dev \
+libio-compress-brotli-perl \
+libaom-dev
+
+jq \
+libde265-0 \
+libexif12 \
+libexpat1 \
+libgcc-s1 \
+libglib2.0-0 \
+libgomp1 \
+libgsf-1-114 \
+liblcms2-2 \
+liblqr-1-0 \
+libltdl7 \
+libopenexr-3-1-30 \
+libopenjp2-7 \
+librsvg2-2 \
+libspng0 \
+mesa-utils \
+mesa-va-drivers \
+mesa-vulkan-drivers \
+tini \
+wget \
+zlib1g \
+ocl-icd-libopencl1 \
+postgresql-client-14 \
+postgresql-client-15 \
+postgresql-client-16 \
+postgresql-client-17 \
+postgresql-client-18 \
+libio-compress-brotli-perl \
+libwebp7 \
+libwebpdemux2 \
+libwebpmux3 \
+libhwy1t64 \
+libaom3 && \
+
+base image: https://github.com/immich-app/base-images/blob/main/server/Dockerfile
+compile layer:
+FROM node:22.19.0-${DEBIAN_RELEASE}-slim@sha256:d02467efc049791a7586a20e36d9219d184ab89e45b19c57e88cff322678c233 AS base
+apt install packages (see above first group)
+postgresql from pgdg repository
+libheif freshly compiled
+libjxl freshly compiled
+libraw freshly compiled
+imagemagick freshly compiled (using above compiled libraries)
+libvips freshly compiled (using above compiled libraries and imagemagick)
+installs jellyfin-ffmpeg7 via deb github release download
+prod layer:
+FROM node:22.19.0-${DEBIAN_RELEASE}-slim@sha256:d02467efc049791a7586a20e36d9219d184ab89e45b19c57e88cff322678c233 AS prod
+postgresql from pgdg repository
+apt install packages (see above second group)
+installs jellyfin-ffmpeg7 via deb github release download
+downloads geodata
+installs libmimalloc3 from testing
+ENV LD_LIBRARY_PATH=/usr/lib/jellyfin-ffmpeg/lib:/usr/lib/wsl/lib
+installs some drivers
+
+server image: https://github.com/immich-app/immich/blob/main/server/Dockerfile
+sets nvidia envs
+starts server
+
+machine-learning image: https://github.com/immich-app/immich/blob/main/machine-learning/Dockerfile
+FROM python:3.11-bookworm@sha256:fc1f2e357c307c4044133952b203e66a47e7726821a664f603a180a0c5823844 AS builder-cpu
+builds armnn from source
+FROM rocm/dev-ubuntu-22.04:6.4.3-complete@sha256:1f7e92ca7e3a3785680473329ed1091fc99db3e90fcb3a1688f2933e870ed76b AS builder-rocm
+builds onnx from source
+FROM builder-${DEVICE} AS builder
+uv sync stuff
+FROM python:3.11-slim-bookworm@sha256:873f91540d53b36327ed4fb018c9669107a4e2a676719720edb4209c4b15d029 AS prod-cpu
+ENV LD_PRELOAD=/usr/lib/libmimalloc.so.2 MACHINE_LEARNING_MODEL_ARENA=false
+FROM python:3.11-slim-bookworm@sha256:873f91540d53b36327ed4fb018c9669107a4e2a676719720edb4209c4b15d029 AS prod-openvino
+installs intel openvino stuff
+FROM nvidia/cuda:12.2.2-runtime-ubuntu22.04@sha256:94c1577b2cd9dd6c0312dc04dff9cb2fdce2b268018abc3d7c2dbcacf1155000 AS prod-cuda
+ENV LD_PRELOAD=/usr/lib/libmimalloc.so.2 MACHINE_LEARNING_MODEL_ARENA=false
+installs nvidia cuda stuff
+FROM prod-${DEVICE} AS prod
+installs ccache libgl1 libglib2.0-0 libgomp1 $(if ! [ "$DEVICE" = "openvino" ] && ! [ "$DEVICE" = "rocm" ]; then echo "libmimalloc2.0"; fi)
+ENV TRANSFORMERS_CACHE=/cache \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PATH="/opt/venv/bin:$PATH" \
+    PYTHONPATH=/usr/src \
+    DEVICE=${DEVICE} \
+    VIRTUAL_ENV=/opt/venv \
+    MACHINE_LEARNING_CACHE_FOLDER=/cache
+CMD ["python", "-m", "immich_ml"]
+
+apt-get install devscripts equivs if not already installed
+apt-get install debian-keyring for ubuntu
+dget https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/vips/8.17.3-1/vips_8.17.3-1.dsc for ubuntu
+dget http://deb.debian.org/debian/pool/main/v/vips/vips_8.17.3-1.dsc for debian
+cd vips-8.17.3/
+mk-build-deps -i -r debian/control -t "apt-get -y -o Debug::pkgProblemResolver=yes --no-install-recommends --yes"
+debuild -b -uc -us
+apt-get install ../libvips42t64_8.17.3-1_amd64.deb for installing immich
+apt-get install ../libvips42t64_8.17.3-1_amd64.deb ../libvips-dev_8.17.3-1_amd64.deb ../gir1.2-vips-8.0_8.17.3-1_amd64.deb for building immich
+
+# dpkg-shlibdeps: error: cannot find library libavcodec-76c43bf0.so.59.37.100 needed by
+libavcodec-76c43bf0.so.59.37.100
+libavutil-734d06dd.so.57.28.100
+libbrotlicommon-3ecfe81c.so.1
+libbrotlidec-ba690955.so.1
+libcrypto-8c1ab3ad.so.1.1
+libfreetype-be14bf51.so.6.20.1
+libgeos-3ef06f11.so.3.13.1
+libgfortran-040039e1.so.5.0.0
+libjpeg-77ae51ab.so.62.4.0
+liblzma-13fa198c.so.5.4.5
+libpng16-58efbb84.so.16.43.0
+libquadmath-96973f99.so.0.0.0
+libsharpyuv-898c0cb5.so.0.1.0
+libssl-28bef1ac.so.1.1
+libswresample-3e7db482.so.4.7.100
+libvpx-9f572e11.so.9.1.0
+libwebp-2fd3cdca.so.7.1.9
+libXau-00ec42fe.so.6.0.0
+libxcb-render-637b984a.so.0.0.0
+libxcb-shm-7a199f70.so.0.0.0
+libxcb-util-4d666913.so.1.0.0
+
+
+dpkg-shlibdeps: warning: can't extract name and version from library name 'libopenblas-r0-f650aae0.3.3.so'
+dpkg-shlibdeps: warning: can't extract name and version from library name 'libopenblas-r0-f650aae0.3.3.so'
+dpkg-shlibdeps: warning: can't extract name and version from library name 'libopenblas-r0-f650aae0.3.3.so'
+
+dpkg-shlibdeps: warning: can't extract name and version from library name 'libscipy_openblas64_-fdde5778.so'
+dpkg-shlibdeps: warning: can't extract name and version from library name 'libscipy_openblas64_-fdde5778.so'
+dpkg-shlibdeps: warning: can't extract name and version from library name 'libscipy_openblas64_-fdde5778.so'
