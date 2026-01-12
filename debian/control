@@ -39,8 +39,7 @@ Description: Self-hosted photo and video management solution - All-In-One
 Package: immich-server
 Architecture: any
 Pre-Depends: ${misc:Pre-Depends},
-Depends:
-         imagemagick,
+Depends: imagemagick,
          immich-geo-data,
          immich-web-data (= ${source:Version}),
          jellyfin-ffmpeg7 | ffmpeg,
@@ -143,16 +142,18 @@ Description: Self-hosted photo and video management solution - db requirements
  This metapackage helps installing the required database and extensions by
  defining those as dependencies.
 
-# https://docs.immich.app/administration/postgres-standalone/#prerequisites -> Prerequisites -> supported versions
-# Defining only upper bounds as you can't define actual dependency range 
+# https://docs.immich.app/administration/postgres-standalone/#prerequisites -> supported versions
+# Defining only upper bounds as you can't define actual dependency range
 
 Package: immich-db-reqs-16
 Architecture: all
 Pre-Depends: ${misc:Pre-Depends},
 Depends: postgresql-16,
-         postgresql-16-pgvector (<< 0.9.0),
-         postgresql-16-vchord (<< 0.6.0),
+         postgresql-16-pgvector (>= 0.7.0),
+         postgresql-16-vchord (>= 0.3.0),
          ${misc:Depends},
+Conflicts: postgresql-16-pgvector (>= 0.9.0),
+           postgresql-16-vchord (>= 0.6.0),
 Built-Using: ${misc:Built-Using},
 Description: Self-hosted photo and video management solution - db requirements
  Easily back up, organize, and manage your photos on your own server. immich
@@ -166,9 +167,11 @@ Package: immich-db-reqs-17
 Architecture: all
 Pre-Depends: ${misc:Pre-Depends},
 Depends: postgresql-17,
-         postgresql-17-pgvector (<< 0.9.0),
-         postgresql-17-vchord (<< 0.6.0),
+         postgresql-17-pgvector (>= 0.7.0),
+         postgresql-17-vchord (>= 0.3.0),
          ${misc:Depends},
+Conflicts: postgresql-17-pgvector (>= 0.9.0),
+           postgresql-17-vchord (>= 0.6.0),
 Built-Using: ${misc:Built-Using},
 Description: Self-hosted photo and video management solution - db requirements
  Easily back up, organize, and manage your photos on your own server. immich
@@ -182,9 +185,11 @@ Package: immich-db-reqs-18
 Architecture: all
 Pre-Depends: ${misc:Pre-Depends},
 Depends: postgresql-18,
-         postgresql-18-pgvector (<< 0.9.0),
-         postgresql-18-vchord (<< 0.6.0),
+         postgresql-18-pgvector (>= 0.7.0),
+         postgresql-18-vchord (>= 0.3.0),
          ${misc:Depends},
+Conflicts: postgresql-18-pgvector (>= 0.9.0),
+           postgresql-18-vchord (>= 0.6.0),
 Built-Using: ${misc:Built-Using},
 Description: Self-hosted photo and video management solution - db requirements
  Easily back up, organize, and manage your photos on your own server. immich
