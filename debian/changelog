@@ -1,3 +1,9 @@
+immich (2.4.1-0alpha12) unstable; urgency=medium
+
+  * revert to generic dependencies without version constraints
+
+ -- dionysius <dragon.dionysius@gmail.com>  Mon, 12 Jan 2026 12:23:59 +0100
+
 immich (2.4.1-0alpha11) unstable; urgency=medium
 
   * revert to generic immich-db-reqs package and define explicit vchord version
