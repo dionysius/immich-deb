@@ -5,7 +5,7 @@ set -e
 
 # remove vchord extension from configuration automatically on package uninstall
 if [ "$1" = "remove" ]; then
-  for conf in /etc/postgresql/*/main/conf.d;  do
+  find /etc/postgresql -maxdepth 3 -type d -name "conf.d" 2>/dev/null | while read -r conf; do
     pgver=$(basename "$(dirname "$conf")")
 
     # only if the file did exist
