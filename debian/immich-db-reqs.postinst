@@ -3,8 +3,8 @@ set -e
 
 # add vchord extension to configuration automatically on package install
 if [ "$1" = "configure" ] || [ "$1" = "abort-upgrade" ] || [ "$1" = "abort-deconfigure" ] || [ "$1" = "abort-remove" ] ; then
-  find /etc/postgresql -maxdepth 3 -type d -name "conf.d" 2>/dev/null | while read -r conf; do
-    pgver=$(basename "$(dirname "$conf")")
+  for conf in /etc/postgresql/*/main/conf.d; do
+    pgver=$(basename "$(dirname "$(dirname "$conf")")")
 
     # skip if shared_preload_libraries is active in any other file, trying to avoid breaking existing setups
     if grep -R -E "^shared_preload_libraries" "/etc/postgresql/$pgver/" --exclude='*immich-db-reqs*' -q; then
