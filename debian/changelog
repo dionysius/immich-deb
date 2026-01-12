@@ -1,3 +1,9 @@
+immich (2.4.1-0alpha14) unstable; urgency=medium
+
+  * fix pg version parsing
+
+ -- dionysius <dragon.dionysius@gmail.com>  Mon, 12 Jan 2026 14:29:17 +0100
+
 immich (2.4.1-0alpha13) unstable; urgency=medium
 
   * shell expansion seem not to be available in maintscripts
