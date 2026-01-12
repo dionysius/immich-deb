@@ -134,7 +134,7 @@ Pre-Depends: ${misc:Pre-Depends},
 # https://docs.immich.app/administration/postgres-standalone/#prerequisites -> supported versions
 Depends: postgresql,
          postgresql-pgvector | postgresql-18-pgvector | postgresql-17-pgvector | postgresql-16-pgvector,
-         postgresql-vchord (= 0.5.3-1) | postgresql-18-vchord (= 0.5.3-1) | postgresql-17-vchord (= 0.5.3-1) | postgresql-16-vchord (= 0.5.3-1),
+         postgresql-vchord | postgresql-18-vchord | postgresql-17-vchord | postgresql-16-vchord,
          ${misc:Depends},
 Built-Using: ${misc:Built-Using},
 Description: Self-hosted photo and video management solution - db requirements
