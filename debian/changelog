@@ -1,3 +1,9 @@
+immich (2.4.1-0alpha11) unstable; urgency=medium
+
+  * revert to generic immich-db-reqs package and define explicit vchord version
+
+ -- dionysius <dragon.dionysius@gmail.com>  Mon, 12 Jan 2026 11:57:44 +0100
+
 immich (2.4.1-0alpha10) unstable; urgency=medium
 
   * use conflicts to limit upper bounds of pg extensions
