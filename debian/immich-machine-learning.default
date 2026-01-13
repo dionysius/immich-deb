@@ -111,7 +111,7 @@ UV_NO_EDITABLE=true
 UV_NO_PROGRESS=true
 UV_REQUIRE_HASHES=true
 # managed python
-UV_PYTHON=3.12.12
+UV_PYTHON=3.12
 UV_PYTHON_PREFERENCE=only-managed
 
 ### Other settings ###
