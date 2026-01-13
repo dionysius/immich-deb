@@ -19,6 +19,8 @@ UMask=0007
 
 # Directories used by the service
 StateDirectory=immich immich/data immich/plugins
+# Permissions only for user and group immich
+StateDirectoryMode=0750
 
 # The location of the env file for configuration
 EnvironmentFile=/etc/default/immich-server
