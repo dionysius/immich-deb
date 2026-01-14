@@ -17,9 +17,11 @@ CacheDirectory=immich
 EnvironmentFile=/etc/default/immich-machine-learning
 # build info
 EnvironmentFile=/usr/share/doc/immich-machine-learning/build.env
+# Add uv to PATH
+Environment=PATH=/usr/lib/immich/machine-learning/bin:$PATH
 
 # Start the server
-ExecStart=/usr/lib/immich/machine-learning/bin/uv run --extra $DEVICE -m immich_ml
+ExecStart=uv run --extra $DEVICE -m immich_ml
 # Set the working directory
 WorkingDirectory=/usr/lib/immich/machine-learning
 

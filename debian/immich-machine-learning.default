@@ -117,8 +117,8 @@ UV_PYTHON_PREFERENCE=only-managed
 ### Other settings ###
 # Since this file exposes environment variables to the immich machine learning
 # service, any variable customization for modules can also be set here.
-# According to the immich docker source many gpu device types benefit from mimalloc
-LD_PRELOAD=/usr/lib/libmimalloc.so.2
+# According to the immich docker source inference code for many gpu types benefit from mimalloc
+LD_PRELOAD=libmimalloc.so.3
 # cache for everyone respecting XDG_CACHE_HOME
 XDG_CACHE_HOME=/var/cache/immich/.cache
 # cache for matplotlib
