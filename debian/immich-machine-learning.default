@@ -117,4 +117,7 @@ UV_PYTHON_PREFERENCE=only-managed
 ### Other settings ###
 # Since this file exposes environment variables to the immich machine learning
 # service, any variable customization for modules can also be set here.
-MPLCONFIGDIR=/var/cache/immich/uv/matplotlib
+# cache for everyone respecting XDG_CACHE_HOME
+XDG_CACHE_HOME=/var/cache/immich/.cache
+# cache for matplotlib
+MPLCONFIGDIR=/var/cache/immich/.cache/matplotlib
