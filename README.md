@@ -4,11 +4,11 @@ Easy to install and highly configurable debian packages for running [immich](htt
 
 ## Installation
 
-Easiest to install is using the the apt repository on [apt.crunchy.run](https://apt.crunchy.run/immich). For the all-in-one package install the `immich` package which will install all immich components and their required dependencies. For a customized installation use `immich-server`, `immich-machine-learning`, `immich-db-reqs`, `redis-server` and `immich-cli` in any combination. immich currently requires a newer nodejs version than is available so you will need the apt repository from [nodesource](https://downloads.nodesource.com) (for `immich-server` and `immich-cli`), don't worry you'll get notified by apt if dependency requirements can't be fullfilled.
+The easiest way to install immich is using the apt repository on [apt.crunchy.run/immich](https://apt.crunchy.run/immich). Installation instructions are available directly on the repository page.
 
-Alternatively you can download the prebuilt packages for manual installation from the [releases section](https://github.com/dionysius/immich-deb/releases) and you can verify the signatures with this [signing-key](signing-key.pub). They are automatically built in [Github Actions](https://github.com/dionysius/immich-deb/actions) for the latest Ubuntu LTS and Debian stable (only `amd64` for now).
+For detailed installation guides, including basic and advanced setup options, see the [Installation Wiki](https://github.com/dionysius/immich-deb/wiki/Installation).
 
-Quick all-in-one installation commands:
+Quick all-in-one installation:
 
 ```bash
 sudo apt-get install curl
@@ -17,58 +17,18 @@ curl -fsSL https://apt.crunchy.run/immich/install.sh | sudo bash -
 sudo apt-get install immich
 ```
 
-After installation please read **thouroughly** through the config files containing plentyful of comments and links in `/etc/immich`. You mainly need to setup credentials for between the services, adjust the listener address, and customize the services to your needs. The directory where immich will store your media by default is `/var/lib/immich/data`. Remember to keep good security and backup hygiene.
+Alternatively, download prebuilt packages from the [releases section](https://github.com/dionysius/immich-deb/releases) and verify signatures with the [signing-key](signing-key.pub). Packages are automatically built in [Github Actions](https://github.com/dionysius/immich-deb/actions) for Ubuntu LTS and Debian stable (amd64 only).
 
-Quick setup of a postgresql user, the printed password should be set in the immich-server database settings: (Warning! This will create a superuser, but this way immich can initialize the pgvector extension and it can make backups for you.)
+## Configuration
 
-```bash
- password=$(openssl rand -base64 32)
- echo "generated password is: ${password}"
- echo "create role immich with login superuser password '$password';" | sudo -u postgres psql
- echo "create database immich;" | sudo -u postgres psql
- echo "grant all privileges on database immich to immich;" | sudo -u postgres psql
-```
+After installation, you'll need to configure the services. For complete setup instructions including database configuration, network settings, and service management, see the [Configuration Wiki](https://github.com/dionysius/immich-deb/wiki/Configuration).
 
-After you have set the credentials in the database settings, restart the server with:
+For advanced topics:
 
-```bash
-systemctl restart immich-server.service
-```
+- [External Libraries](https://github.com/dionysius/immich-deb/wiki/External-Libraries) - Configure access to media outside the default directory
+- [Hardware Acceleration](https://github.com/dionysius/immich-deb/wiki/Hardware-Acceleration) - GPU acceleration setup
 
-The services should be up `active (running)`, you can check the status with:
-
-```bash
-systemctl status immich-server.service
-systemctl status immich-machine-learning.service
-# or to see whats wrong (scroll down)
-journalctl -u immich-server.service
-journalctl -u immich-machine-learning.service
-```
-
-If this immich installation is on your local machine you can now navigate to `http://localhost:2283` in your browser.
-
-To access immich from other devices on your network, update the host setting: (Warning! This will allow immich to be accessed from your entire network)
-
-```env
-IMMICH_HOST=0.0.0.0
-```
-
-Restart the service and verify it's running:
-
-```bash
-systemctl restart immich-server.service
-systemctl status immich-server.service
-```
-
-You can now navigate to `http://<ip-of-your-system>:2283` from any device on your network and the immich web UI should appear.
-
-## Advanced configuration
-
-You can configure everything related to how the services are run through these enviroment files. Apt will notify during upgrade if it detects changes. Any changes to systemd units should be made with `systemctl edit <unit file>`. Remember to be sure what each setting you change does, keep your system safe.
-
-While the goal is that those packages bring everything you need, the machine-learning server currently runs with [`uv`](https://docs.astral.sh/uv/) at runtime to download python (if needed) and dependencies.
-
-...
+See also the [Official Immich Documentation](https://docs.immich.app/) for user guides and features.
 
 ## Build source package
 
@@ -91,12 +51,7 @@ This debian source package builds [immich](https://github.com/immich-app/immich)
   - There are many arguments to fine-tune the build (see `gbp buildpackage --help` and `dpkg-buildpackage --help`)
   - Notable options: `-b` (binary-only, no source files), `-us` (unsigned source package), `-uc` (unsigned .buildinfo and .changes file), `--git-export-dir=<somedir>` (before building the package export the source there)
 
-## TODOs
-
-- automatic testing
-- describe predefined dependency pgvector, upgrade to vectorcord possible
-
 ## Inspirations and Alternatives
 
-- https://github.com/arter97/immich-native
-- https://snapcraft.io/immich-distribution
+- [immich-native](https://github.com/arter97/immich-native)
+- [immich-distribution](https://snapcraft.io/immich-distribution)
