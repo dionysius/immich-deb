@@ -1,3 +1,11 @@
+immich (2.4.1-1) unstable; urgency=medium
+
+  * libmaimalloc is registered in ldconfig
+  * add immich user to the render group
+  * first stable release
+
+ -- dionysius <dragon.dionysius@gmail.com>  Wed, 14 Jan 2026 15:25:00 +0100
+
 immich (2.4.1-0alpha15) unstable; urgency=medium
 
   * limit state directories permissions only to immich
