@@ -74,6 +74,7 @@ Pre-Depends: ${misc:Pre-Depends},
 # We compile stuff in uv so need a compiler and other headers
 Depends: g++,
          libgl-dev,
+         libmimalloc3,
          ${misc:Depends},
 Recommends: ${misc:Recommends},
 Built-Using: ${misc:Built-Using},
