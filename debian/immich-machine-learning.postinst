@@ -3,6 +3,7 @@ set -e
 
 if [ "$1" = "configure" ]; then
   adduser --system --group --quiet --no-create-home --home /var/lib/immich immich >/dev/null || true
+  usermod -a -G render immich >/dev/null || true
 
   if [ -f /etc/default/immich-machine-learning ]; then
     if ! dpkg-statoverride --list /etc/default/immich-machine-learning >/dev/null 2>&1; then
