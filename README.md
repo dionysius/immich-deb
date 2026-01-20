@@ -30,26 +30,45 @@ For advanced topics:
 
 See also the [Official Immich Documentation](https://docs.immich.app/) for user guides and features.
 
+## Issues
+
+As this package provides an alternative installation method, there may be differences from the official Docker images. **Please verify any problems are also reproducible with their official Docker images before reporting upstream**.
+
+- [Official Help Page](https://docs.immich.app/overview/help) - For issues with immich
+- [Issues](https://github.com/dionysius/immich-deb/issues) and [Discussions](https://github.com/dionysius/immich-deb/discussions) - For issues with or related to these packages
+
 ## Build source package
 
 This debian source package builds [immich](https://github.com/immich-app/immich) natively on your build environment. No annoying docker! It is managed with [git-buildpackage](https://wiki.debian.org/PackagingWithGit) and aims to be a pretty good quality debian source package. You can find the maintaining command summary in [debian/gbp.conf](debian/gbp.conf).
 
 ### Requirements
 
-- Installed `git-buildpackage` from your apt
-- Installed build dependencies as defined in [debian/control `Build-Depends`](debian/control) (will notify you in the build process otherwise)
-  - [`mk-build-deps`](https://manpages.debian.org/testing/devscripts/mk-build-deps.1.en.html) can help you automate the installation
-- If `nodejs`/`npm` is not recent enough
-  - Don't forget to look into your `*-updates`/`*-backports` apt sources for newer versions
-  - Use a package from [nodesource](https://github.com/nodesource/distributions/blob/master/README.md)
+Installed `git-buildpackage` from your apt
+
+Installed build dependencies as defined in [debian/control `Build-Depends`](debian/control) (will notify you in the build process otherwise). [`mk-build-deps`](https://manpages.debian.org/testing/devscripts/mk-build-deps.1.en.html) can help you automate the installation, for example:
+
+```bash
+mk-build-deps -i -r debian/control -t "apt-get -o Debug::pkgProblemResolver=yes --no-install-recommends --yes"
+```
+
+If `nodejs`/`npm` is not recent enough don't forget to look into your `*-updates`/`*-backports` apt sources for newer versions or use a package from [nodesource](https://github.com/nodesource/distributions/blob/master/README.md)
 
 ### Build package
 
-- Clone with git-buildpackage: `gbp clone https://github.com/dionysius/immich-deb.git`
-- Switch to the folder: `cd immich-deb`
-- Build with git-buildpackage: `gbp buildpackage`
-  - There are many arguments to fine-tune the build (see `gbp buildpackage --help` and `dpkg-buildpackage --help`)
-  - Notable options: `-b` (binary-only, no source files), `-us` (unsigned source package), `-uc` (unsigned .buildinfo and .changes file), `--git-export-dir=<somedir>` (before building the package export the source there)
+Clone with git-buildpackage and switch to the folder:
+
+```bash
+gbp clone https://github.com/dionysius/immich-deb.git
+cd immich-deb
+```
+
+Build with git-buildpackage - there are many arguments to fine-tune the build (see `gbp buildpackage --help` and `dpkg-buildpackage --help`), notable options: `-b` (binary-only, no source files), `-us` (unsigned source package), `-uc` (unsigned .buildinfo and .changes file), `--git-export-dir=<somedir>` (before building the package export the source there), for example:
+
+```bash
+gbp buildpackage -b -us -uc
+```
+
+On successful build packages can now be found in the parent directory `ls ../*.deb`.
 
 ## Inspirations and Alternatives
 
