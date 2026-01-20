@@ -138,9 +138,9 @@ override_dh_prep:
 	rm -rf $(TMPDEB)/build
 	dh_prep -X $(TMPDEB)
 
-# Don't automatically start immich-server on installation - it requires configuration first
+# Don't automatically start immich-server on installation it requires configuration first but restart on upgrade if it was running
 override_dh_installsystemd:
-	dh_installsystemd -pimmich-server --no-start
+	dh_installsystemd -pimmich-server --no-start --restart-after-upgrade
 	dh_installsystemd -pimmich-machine-learning
 
 override_dh_strip:
