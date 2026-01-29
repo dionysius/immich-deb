@@ -1,3 +1,9 @@
+immich (2.5.0-2) unstable; urgency=medium
+
+  * define RUSTUP_HOME for machine-learning config, some python dependency now installs rustup
+
+ -- dionysius <dragon.dionysius@gmail.com>  Thu, 29 Jan 2026 03:26:46 +0100
+
 immich (2.5.0-1) unstable; urgency=medium
 
   * update to 2.5.0, see also: https://github.com/immich-app/immich/releases/tag/v2.5.0
