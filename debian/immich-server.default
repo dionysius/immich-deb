@@ -18,6 +18,8 @@ IMMICH_MEDIA_LOCATION=/var/lib/immich/data
 #IMMICH_CONFIG_FILE=
 # Set to true to disable color-coded log output
 #NO_COLOR=false
+# When false disables the /auth/admin-sign-up endpoint
+#IMMICH_ALLOW_SETUP=true
 # Port for the OTEL metrics
 #IMMICH_API_METRICS_PORT=8081
 # Port for the OTEL metrics
