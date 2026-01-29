@@ -123,3 +123,5 @@ LD_PRELOAD=libmimalloc.so.3
 XDG_CACHE_HOME=/var/cache/immich/.cache
 # cache for matplotlib
 MPLCONFIGDIR=/var/cache/immich/.cache/matplotlib
+# cache for rustup (watchfiles uses puccinialin/rustup)
+RUSTUP_HOME=/var/cache/immich/.cache/rustup
