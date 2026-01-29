@@ -12,7 +12,7 @@ Quick all-in-one installation:
 
 ```bash
 sudo apt-get install curl
-curl -fsSL https://deb.nodesource.com/setup_22.x | sudo bash -
+curl -fsSL https://deb.nodesource.com/setup_24.x | sudo bash -
 curl -fsSL https://apt.crunchy.run/immich/install.sh | sudo bash -
 sudo apt-get install immich
 ```
