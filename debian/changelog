@@ -1,3 +1,15 @@
+immich (2.5.0-1) unstable; urgency=medium
+
+  * update to 2.5.0, see also: https://github.com/immich-app/immich/releases/tag/v2.5.0
+  * restart immich-server after upgrade if it was running
+  * add IMMICH_ALLOW_SETUP to immich-server config
+  * immich-server and immich-cli now require nodejs 24.x
+  * upstream now compiles ffmpeg by source, keep support for jellyfin-ffmpeg7 for now
+  * upstream images for machine-learning variant openvino now use python 3.13, you may want to set UV_PYTHON=3.13 in machine-learning config if you use DEVICE=openvino
+  * update bundled uv to 0.9.27
+
+ -- dionysius <dragon.dionysius@gmail.com>  Thu, 29 Jan 2026 02:29:34 +0100
+
 immich (2.4.1-1) unstable; urgency=medium
 
   * libmaimalloc is registered in ldconfig
