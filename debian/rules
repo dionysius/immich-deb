@@ -135,6 +135,8 @@ override_dh_auto_build:
 	cp $(TMPDEB)/usr/share/doc/immich-server/build.env $(TMPDEB)/usr/share/doc/immich-machine-learning/build.env
 
 # generate empty build-lock.json to suppress warnings, upstream falls back to commands in server/src/repositories/server-info.repository.ts getBuildVersions(), which is arguably better
+# additionally we could write this file in service's startup using ExecStartPre if the long version names get annoying
+	mkdir -p $(TMPDEB)/usr/lib/immich/.build
 	echo "{}" > $(TMPDEB)/usr/lib/immich/.build/build-lock.json
 
 override_dh_prep:

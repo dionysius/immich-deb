@@ -128,4 +128,3 @@ NODE_ENV=production
 ### Other settings ###
 # Since this file exposes environment variables to the immich server service,
 # any variable customization for modules can also be set here. E.g.
-#UV_THREADPOOL_SIZE=

@@ -72,5 +72,6 @@ On successful build packages can now be found in the parent directory `ls ../*.d
 
 ## Inspirations and Alternatives
 
-- [immich-native](https://github.com/arter97/immich-native)
-- [immich-distribution](https://snapcraft.io/immich-distribution)
+- [immich-native script](https://github.com/arter97/immich-native)
+- [immich-distribution snap](https://snapcraft.io/immich-distribution)
+- [immich for Proxmox VE](https://community-scripts.github.io/ProxmoxVE/scripts?id=immich)
