@@ -28,7 +28,11 @@ EnvironmentFile=/etc/default/immich-server
 EnvironmentFile=/usr/share/doc/immich-server/build.env
 
 # Start the server
-ExecStart=/bin/bash -c 'PATH=/usr/lib/jellyfin-ffmpeg:$PATH exec node dist/main $@'
+ExecStart=/bin/sh -c ' \
+  UV_THREADPOOL_SIZE=$(/usr/lib/immich/server/bin/get-cpus.sh) \
+  LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/jellyfin-ffmpeg/lib \
+  PATH=/usr/lib/jellyfin-ffmpeg:$PATH \
+  exec node dist/main "$@"'
 # Set the working directory
 WorkingDirectory=/usr/lib/immich/server
 

@@ -1,5 +1,7 @@
 plugins/dist usr/share/immich/plugins
 plugins/manifest.json usr/share/immich/plugins
+server/bin/get-cpus.sh usr/lib/immich/server/bin
+debian/wrappers/immich-admin usr/sbin
 usr/lib/immich/server/.pnpm-store
 usr/lib/immich/server/dist
 usr/lib/immich/server/node_modules
