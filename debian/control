@@ -76,6 +76,7 @@ Depends: g++,
          libgl-dev,
          libmimalloc3,
          ${misc:Depends},
+         ${shlibs:Depends},
 Recommends: ${misc:Recommends},
 Built-Using: ${misc:Built-Using},
 Description: Self-hosted photo and video management solution - ML server
