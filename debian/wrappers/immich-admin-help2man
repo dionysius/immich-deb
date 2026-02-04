@@ -1,0 +1,16 @@
+#!/usr/bin/env node
+
+// ONLY FOR USE during package build to generate man pages with help2man
+
+// Suppress console.log
+console.log = function() {};
+
+// Suppress Node.js warnings (like ExperimentalWarning for WASI)
+process.removeAllListeners('warning');
+process.on('warning', () => {});
+
+// Inject "immich-admin" as the first argument
+process.argv.splice(2, 0, 'immich-admin');
+
+// Load and execute the main module
+require('./dist/main');
