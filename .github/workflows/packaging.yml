@@ -14,10 +14,14 @@ jobs:
 
   build-native:
     uses: dionysius/gbp-gha/.github/workflows/gbp-native.yml@main
+    secrets:
+      GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
     with:
       # https://github.com/orgs/community/discussions/26671
       DEBFULLNAME: dionysius (github-actions)
       DEBEMAIL: dragon.dionysius+gha@gmail.com
+      distros: '["ubuntu:latest", "debian:stable"]'
+      architectures: '["amd64", "arm64"]'
       before_build_deps_install: |
         curl -fsSL https://deb.nodesource.com/setup_24.x | bash -
         apt-get install -y nodejs
@@ -26,9 +30,10 @@ jobs:
         [[ "$dist" == Ubuntu* ]] && dist="x${dist}"
         echo "deb [signed-by=/etc/apt/keyrings/obs-dionysius.key] https://download.opensuse.org/repositories/home:/dionysius:/immich/$dist/ /" | tee /etc/apt/sources.list.d/obs-dionysius.list
         apt-get update
-    secrets:
-      GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+
   release:
     if: startsWith(github.event.ref, 'refs/tags/debian')
     needs: [build-native]
     uses: dionysius/gbp-gha/.github/workflows/release.yml@main
+    with:
+      publish: true
