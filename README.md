@@ -11,13 +11,13 @@ For detailed installation guides, including basic and advanced setup options, se
 Quick all-in-one installation:
 
 ```bash
-sudo apt-get install curl
+sudo apt install curl
 curl -fsSL https://deb.nodesource.com/setup_24.x | sudo bash -
 curl -fsSL https://apt.crunchy.run/immich/install.sh | sudo bash -
-sudo apt-get install immich
+sudo apt install immich
 ```
 
-Alternatively, download prebuilt packages from the [releases section](https://github.com/dionysius/immich-deb/releases) and verify signatures with the [signing-key](signing-key.pub). Packages are automatically built in [Github Actions](https://github.com/dionysius/immich-deb/actions) for Ubuntu LTS and Debian stable (amd64 only).
+Alternatively, download prebuilt packages from the [releases section](https://github.com/dionysius/immich-deb/releases) and verify signatures with the [signing-key](signing-key.pub). Packages are automatically built in [Github Actions](https://github.com/dionysius/immich-deb/actions).
 
 ## Configuration
 
