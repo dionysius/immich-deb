@@ -1,3 +1,18 @@
+immich (2.5.3-1) unstable; urgency=medium
+
+  * update to 2.5.3, see also https://github.com/immich-app/immich/releases/tag/v2.5.3
+  * this is the first build using immutable releases and release attestation!
+  * add arm64 to build pipeline, arm64 packages are now available
+  * generate empty build-lock.json to suppress warnings, upstream falls back to commands in server/src/repositories/server-info.repository.ts getBuildVersions(), which is arguably better (fixes #6)
+  * add proxmox VE as inspiration and alternative
+  * dynamic UV_THREADPOOL_SIZE, add immich-admin CLI wrapper, add include LD_LIBRARY_PATH for jellyfin-ffmpeg
+  * add shlibs:Depends for immich-machine-learning package
+  * add perl:Depends for immich-server package
+  * help2man for immich-admin
+  * only set UV_THREADPOOL_SIZE if above 4 detected logical cpu cores
+
+ -- dionysius <dragon.dionysius@gmail.com>  Thu, 05 Feb 2026 06:52:31 +0100
+
 immich (2.5.2-1) unstable; urgency=medium
 
   * update to 2.5.2, see also https://github.com/immich-app/immich/releases/tag/v2.5.2
