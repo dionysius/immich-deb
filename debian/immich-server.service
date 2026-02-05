@@ -29,7 +29,10 @@ EnvironmentFile=/usr/share/doc/immich-server/build.env
 
 # Start the server
 ExecStart=/bin/sh -c ' \
-  UV_THREADPOOL_SIZE=$(/usr/lib/immich/server/bin/get-cpus.sh) \
+  CPU_CORES=$(/usr/lib/immich/server/bin/get-cpus.sh); \
+  if [ "$CPU_CORES" -gt 4 ]; then \
+    UV_THREADPOOL_SIZE=$CPU_CORES; \
+  fi; \
   LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/jellyfin-ffmpeg/lib \
   PATH=/usr/lib/jellyfin-ffmpeg:$PATH \
   exec node dist/main "$@"'

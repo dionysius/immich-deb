@@ -2,16 +2,19 @@
 # reimplemented from https://github.com/immich-app/immich/blob/main/server/bin
 # mainly since we use our own env file
 
-# If not running as immich user, re-exec as immich
+# If not running as immich user, re-exec as immich, just in case immich-admin migrates files so they keep proper ownership
 if [ "$(id -un)" != "immich" ]; then
     exec runuser -u immich -- "$(readlink -f "$0")" "$@"
 fi
 
 cd /usr/lib/immich/server
 
+CPU_CORES=$(./bin/get-cpus.sh)
+if [ "$CPU_CORES" -gt 4 ]; then
+  export UV_THREADPOOL_SIZE=$CPU_CORES
+fi
 export PATH="/usr/lib/jellyfin-ffmpeg:$PATH"
 export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/usr/lib/jellyfin-ffmpeg/lib"
-export UV_THREADPOOL_SIZE=$(./bin/get-cpus.sh)
 
 set -a
 . /etc/default/immich-server
