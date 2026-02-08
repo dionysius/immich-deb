@@ -31,9 +31,109 @@ jobs:
         echo "deb [signed-by=/etc/apt/keyrings/obs-dionysius.key] https://download.opensuse.org/repositories/home:/dionysius:/immich/$dist/ /" | tee /etc/apt/sources.list.d/obs-dionysius.list
         apt-get update
 
+  test:
+    needs: [build-native]
+    timeout-minutes: 5
+    strategy:
+      fail-fast: false
+      matrix:
+        images: ["ubuntu:latest", "debian:stable"]
+        architectures: ["amd64", "arm64"]
+        include:
+          - architectures: "amd64"
+            runner: "ubuntu-24.04"
+          - architectures: "arm64"
+            runner: "ubuntu-24.04-arm"
+    runs-on: ${{ matrix.runner }}
+    container:
+      image: ${{ matrix.images }}
+      env:
+        DEBIAN_FRONTEND: noninteractive
+    steps:
+      - name: Set distro name
+        id: distro
+        run: echo "name=$(echo '${{ matrix.images }}' | tr ':' '-')" >> $GITHUB_OUTPUT
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: results_${{ steps.distro.outputs.name }}_${{ matrix.architectures }}
+          path: /artifacts
+
+      - name: Install dependencies
+        run: |
+          curl -fsSL https://deb.nodesource.com/setup_24.x | bash -
+          curl -fsSL https://build.opensuse.org/projects/home:dionysius:immich/signing_keys/download?kind=gpg | gpg --dearmor -o /etc/apt/keyrings/obs-dionysius.key
+          . /etc/os-release
+          dist="${ID^}_${VERSION_ID}"
+          [[ "$dist" == Ubuntu* ]] && dist="x${dist}"
+          echo "deb [signed-by=/etc/apt/keyrings/obs-dionysius.key] https://download.opensuse.org/repositories/home:/dionysius:/immich/$dist/ /" | tee /etc/apt/sources.list.d/obs-dionysius.list
+          apt-get update
+
+      - name: Install packages
+        run: |
+          apt-get install -y /artifacts/*.deb
+          apt-get install -f
+
+      - name: Configure PostgreSQL
+        run: |
+          echo "create role immich with login superuser password 'myimmichpassword';" | sudo -u postgres psql
+          echo "create database immich;" | sudo -u postgres psql
+          echo "grant all privileges on database immich to immich;" | sudo -u postgres psql
+
+      - name: Start Immich
+        run: |
+          # immich-server does not autostart
+          systemctl start immich-server.service
+          sleep 60
+
+          # Verify services are running
+          for service in immich-server immich-machine-learning; do
+            if ! systemctl is-active --quiet ${service}.service; then
+              echo "ERROR: ${service}.service is not running!"
+              systemctl status ${service}.service || true
+              journalctl -u ${service}.service -n 100 || true
+              exit 1
+            fi
+          done
+
+      - name: Verify log messages
+        run: |
+          # Define required log messages for each service
+          immich_server_messages=(
+            "Immich Microservices is running"
+            "Machine learning server became healthy"
+            "Successfully processed core plugin"
+            "Immich Server is listening on"
+          )
+          
+          immich_machine_learning_messages=(
+            "Listening at"
+            "Application startup complete"
+          )
+          
+          # Map service names to their message arrays
+          declare -A service_messages=(
+            ["immich-server"]="immich_server_messages"
+            ["immich-machine-learning"]="immich_machine_learning_messages"
+          )
+          
+          # Check logs for each service
+          for service in "${!service_messages[@]}"; do
+            logs=$(journalctl -u ${service}.service --no-pager)
+            array_name="${service_messages[$service]}[@]"
+            for msg in "${!array_name}"; do
+              if ! echo "$logs" | grep -q "$msg"; then
+                echo "ERROR: '$msg' not found in ${service} logs"
+                echo "$logs"
+                exit 1
+              fi
+            done
+          done
+
   release:
     if: startsWith(github.event.ref, 'refs/tags/debian')
-    needs: [build-native]
+    needs: [build-native, test]
     uses: dionysius/gbp-gha/.github/workflows/release.yml@main
     with:
       publish: true
