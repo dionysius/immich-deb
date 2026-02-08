@@ -154,11 +154,8 @@ override_dh_shlibdeps:
 
 override_dh_installman:
 	mkdir -p $(TMPDEB)/man/immich-cli $(TMPDEB)/man/immich-server
+	cd $(TMPDEB)/usr/lib/immich/server && help2man "node dist/main immich-admin" -s 8 -n "Administrative command line interface for Immich" --no-info --no-discard-stderr --version-string "immich-admin $(DEB_VERSION_UPSTREAM)" -S immich-server > $(CURDIR)/$(TMPDEB)/man/immich-server/immich-admin.8
 	help2man $(TMPDEB)/usr/lib/immich/cli/bin/immich -n "Command line interface for Immich" --no-info --no-discard-stderr -S immich-cli > $(TMPDEB)/man/immich-cli/immich.1
-# immich-admin is a bit tricky, loads server code and produces warnings. Use a little wrapper script temporarily only for help2man to get a clean --help output
-	cp debian/wrappers/immich-admin-help2man $(TMPDEB)/usr/lib/immich/server/immich-admin
-	cd $(TMPDEB)/usr/lib/immich/server && help2man ./immich-admin -s 8 -n "Administrative command line interface for Immich" --no-info --no-discard-stderr --version-string "$(DEB_VERSION_UPSTREAM)" -S immich-server > $(CURDIR)/$(TMPDEB)/man/immich-server/immich-admin.8
-	rm $(TMPDEB)/usr/lib/immich/server/immich-admin
 	ls -1 -d $(TMPDEB)/man/immich-cli/* > "debian/immich-cli.manpages"
 	ls -1 -d $(TMPDEB)/man/immich-server/* > "debian/immich-server.manpages"
 	dh_installman
