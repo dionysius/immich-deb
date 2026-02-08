@@ -1,3 +1,13 @@
+immich (2.5.5-1) unstable; urgency=medium
+
+  * update to 2.5.5, see also https://github.com/immich-app/immich/releases/tag/v2.5.5
+  * improve build.env generation for more useful about info
+  * use help2man directly for immich-admin again since noisy output have been fixed
+  * update bundled uv to 0.9.30
+  * set UV_THREADPOOL_SIZE by detection only if not already set (allows custom override via env file)
+
+ -- dionysius <dragon.dionysius@gmail.com>  Sun, 08 Feb 2026 10:39:01 +0100
+
 immich (2.5.3-1) unstable; urgency=medium
 
   * update to 2.5.3, see also https://github.com/immich-app/immich/releases/tag/v2.5.3
