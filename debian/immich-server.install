@@ -1,3 +1,4 @@
+build.env usr/share/doc/immich-server
 debian/wrappers/immich-admin usr/sbin
 plugins/dist usr/share/immich/plugins
 plugins/manifest.json usr/share/immich/plugins

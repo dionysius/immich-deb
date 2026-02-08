@@ -130,9 +130,7 @@ override_dh_auto_build:
 	pnpm --filter @immich/sdk --filter @immich/cli licenses list --prod --long | gzip > $(TMPDEB)/usr/share/doc/immich-web-data/THIRD-PARTY-LICENSES.txt.gz
 
 # generate build.env since immich version info is not built-in
-	debian/helpers/generate-build-metadata.sh > $(TMPDEB)/usr/share/doc/immich-server/build.env
-	cp $(TMPDEB)/usr/share/doc/immich-server/build.env $(TMPDEB)/usr/share/doc/immich-cli/build.env
-	cp $(TMPDEB)/usr/share/doc/immich-server/build.env $(TMPDEB)/usr/share/doc/immich-machine-learning/build.env
+	debian/helpers/generate-build-metadata.sh > $(TMPDEB)/build.env
 
 # generate empty build-lock.json to suppress warnings, upstream falls back to commands in server/src/repositories/server-info.repository.ts getBuildVersions(), which is arguably better
 # additionally we could write this file in service's startup using ExecStartPre if the long version names get annoying
