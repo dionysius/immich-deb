@@ -35,9 +35,9 @@ BINARYEN_SHA256_x86_64 = 7c3bc16599c8274a04d34a504fe4be2047884f900e0e2da2f6fb9cd
 BINARYEN_SHA256_aarch64 = d0382de3c189a7cbb9fdda93e2966f4557f6a00f201e2c4937c27ca01cead4fc
 
 # uv version to use (since debian has not packaged it yet)
-UV_VERSION = 0.9.27
-UV_SHA256_x86_64 = 8636e693ea0e05f5f4294b161f816c4d8df065267fdb0405cfb84c8e326991fa
-UV_SHA256_aarch64 = a58b3b77a25620ae15ff3587049b755c7cbf3eaa7df187620b3e6c3dbf71daa0
+UV_VERSION = 0.9.30
+UV_SHA256_x86_64 = 8b3762374972daa7a74bbc6896cc73229ca69a07403dd9f9ea3805a51ffd7582
+UV_SHA256_aarch64 = 6aadf3c71600d594e16dabf382cc15282ead4c5ca768599b6bcb43c5004d9aa8
 
 # steps mostly imitate official docker images, so changes there may need to be reflected here
 # - https://github.com/immich-app/base-images/blob/main/server/Dockerfile
