@@ -20,13 +20,13 @@ jobs:
       # https://github.com/orgs/community/discussions/26671
       DEBFULLNAME: dionysius (github-actions)
       DEBEMAIL: dragon.dionysius+gha@gmail.com
-      distros: '["ubuntu:latest", "debian:stable"]'
+      images: '["ubuntu:latest", "debian:stable"]'
       architectures: '["amd64", "arm64"]'
       before_build_deps_install: |
         curl -fsSL https://deb.nodesource.com/setup_24.x | bash -
-        apt-get install -y nodejs
         curl -fsSL https://build.opensuse.org/projects/home:dionysius:immich/signing_keys/download?kind=gpg | gpg --dearmor -o /etc/apt/keyrings/obs-dionysius.key
-        dist="$(lsb_release -si)_$(lsb_release -sr)"
+        . /etc/os-release
+        dist="${ID^}_${VERSION_ID}"
         [[ "$dist" == Ubuntu* ]] && dist="x${dist}"
         echo "deb [signed-by=/etc/apt/keyrings/obs-dionysius.key] https://download.opensuse.org/repositories/home:/dionysius:/immich/$dist/ /" | tee /etc/apt/sources.list.d/obs-dionysius.list
         apt-get update
@@ -38,3 +38,10 @@ jobs:
     with:
       prerelease: true
       publish: true
+
+  promote:
+    uses: dionysius/gbp-gha/.github/workflows/promote-release.yml@main
+    needs: [release]
+    with:
+      in_days: 7
+      release_pattern: '{debian/*.*}.*'

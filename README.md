@@ -37,6 +37,10 @@ As this package provides an alternative installation method, there may be differ
 - [Official Help Page](https://docs.immich.app/overview/help) - For issues with immich
 - [Issues](https://github.com/dionysius/immich-deb/issues) and [Discussions](https://github.com/dionysius/immich-deb/discussions) - For issues with or related to these packages
 
+## Release schedule
+
+This project aims to closely match the releases of upstream. The first release in each minor version series starts as a prerelease with a 7-day waiting period to allow upstream to fix oversights in new features or changes. Subsequent releases follow the same waiting period. After the waiting period has passed, all prereleases are automatically promoted to normal releases including new releases.
+
 ## Build source package
 
 This debian source package builds [immich](https://github.com/immich-app/immich) natively on your build environment. No annoying docker! It is managed with [git-buildpackage](https://wiki.debian.org/PackagingWithGit) and aims to be a pretty good quality debian source package. You can find the maintaining command summary in [debian/gbp.conf](debian/gbp.conf).
