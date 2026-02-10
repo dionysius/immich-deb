@@ -20,4 +20,4 @@ set -a
 . /etc/default/immich-server
 set +a
 
-exec node dist/main immich-admin "$@"
+exec node --no-warnings dist/main immich-admin "$@"

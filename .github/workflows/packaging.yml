@@ -36,4 +36,5 @@ jobs:
     needs: [build-native]
     uses: dionysius/gbp-gha/.github/workflows/release.yml@main
     with:
+      prerelease: true
       publish: true
