@@ -1,3 +1,11 @@
+immich (2.5.6-1) unstable; urgency=medium
+
+  * update to 2.5.6, see also https://github.com/immich-app/immich/releases/tag/v2.5.6
+  * exclude node warnings in immich-admin like upstream
+  * introduce release schedule, first minor starts waiting timer (fixes #12)
+
+ -- dionysius <dragon.dionysius@gmail.com>  Wed, 11 Feb 2026 08:54:56 +0100
+
 immich (2.5.5-1) unstable; urgency=medium
 
   * update to 2.5.5, see also https://github.com/immich-app/immich/releases/tag/v2.5.5
