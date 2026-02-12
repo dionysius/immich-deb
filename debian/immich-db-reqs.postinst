@@ -15,10 +15,8 @@ if [ "$1" = "configure" ] || [ "$1" = "abort-upgrade" ] || [ "$1" = "abort-decon
     if [ ! -f "$conf/10-immich-db-reqs.conf" ]; then
       echo "shared_preload_libraries = 'vchord'" > "$conf/10-immich-db-reqs.conf"
 
-      # restart postgresql only if it was running
-      if [ -d /run/systemd/system ]; then
-        systemctl try-restart "postgresql@$pgver-main.service" || true
-      fi
+      # restart postgresql only if it was running (deb-systemd-invoke restart checks if it was running)
+      deb-systemd-invoke restart "postgresql@$pgver-main.service" || true
     fi
   done
 fi

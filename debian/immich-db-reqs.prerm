@@ -12,10 +12,8 @@ if [ "$1" = "remove" ]; then
     if [ -f "$conf/10-immich-db-reqs.conf" ]; then
       rm -f "$conf/10-immich-db-reqs.conf"
 
-      # restart postgresql only if it was running
-      if [ -d /run/systemd/system ]; then
-        systemctl try-restart "postgresql@$pgver-main.service" || true
-      fi
+      # restart postgresql only if it was running (deb-systemd-invoke restart checks if it was running)
+      deb-systemd-invoke restart "postgresql@$pgver-main.service" || true
     fi
   done
 fi

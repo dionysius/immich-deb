@@ -12,7 +12,7 @@ Build-Depends: curl,
                pkgconf,
                unzip,
 Maintainer: dionysius <dragon.dionysius@gmail.com>
-Standards-Version: 4.6.1
+Standards-Version: 4.7.2
 Vcs-Git: https://github.com/dionysius/immich-deb.git
 Vcs-Browser: https://github.com/dionysius/immich-deb
 Homepage: https://immich.app
