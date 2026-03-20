@@ -1,3 +1,10 @@
+immich (2.6.1-1) unstable; urgency=medium
+
+  * update to 2.6.1, see also https://github.com/immich-app/immich/releases/tag/v2.6.1
+  * debian policy 4.7.2 package updates
+
+ -- dionysius <dragon.dionysius@gmail.com>  Fri, 20 Mar 2026 02:07:56 +0100
+
 immich (2.5.6-1) unstable; urgency=medium
 
   * update to 2.5.6, see also https://github.com/immich-app/immich/releases/tag/v2.5.6
