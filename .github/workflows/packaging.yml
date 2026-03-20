@@ -12,8 +12,8 @@ concurrency:
 
 jobs:
 
-  build-native:
-    uses: dionysius/gbp-gha/.github/workflows/gbp-native.yml@main
+  build:
+    uses: dionysius/gbp-gha/.github/workflows/build.yml@main
     secrets:
       GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
     with:
@@ -33,7 +33,7 @@ jobs:
 
   release:
     if: startsWith(github.event.ref, 'refs/tags/debian')
-    needs: [build-native]
+    needs: [build]
     uses: dionysius/gbp-gha/.github/workflows/release.yml@main
     with:
       prerelease: true
