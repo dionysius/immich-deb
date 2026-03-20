@@ -58,9 +58,9 @@ IMMICH_PORT=3003
 # Comma-separated list of (detection) facial recognition model(s) to preload
 # and cache
 #MACHINE_LEARNING_PRELOAD__FACIAL_RECOGNITION__DETECTION=
-# Comma-separated list of OCR recognition model(s) to preload
+# Comma-separated list of (recognition) OCR model(s) to preload and cache
 #MACHINE_LEARNING_PRELOAD__OCR__RECOGNITION=
-# Comma-separated list of OCR detection model(s) to preload
+# Comma-separated list of (detection) OCR model(s) to preload and cache
 #MACHINE_LEARNING_PRELOAD__OCR__DETECTION=
 # Enable ARM-NN hardware acceleration if supported
 #MACHINE_LEARNING_ANN=True
