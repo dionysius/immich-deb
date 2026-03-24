@@ -60,11 +60,11 @@ Installed build dependencies as defined in [debian/control `Build-Depends`](debi
 mk-build-deps -i -r debian/control -t "apt-get -o Debug::pkgProblemResolver=yes --no-install-recommends --yes"
 ```
 
-If `nodejs`/`npm` is not recent enough don't forget to look into your `*-updates`/`*-backports` apt sources for newer versions or use a package from [nodesource](https://github.com/nodesource/distributions)
+If `nodejs`/`npm` is not recent enough don't forget to look into your `*-updates`/`*-backports` apt sources for newer versions or use a package from [nodesource](https://github.com/nodesource/distributions).
 
 ### Build package
 
-Build with git-buildpackage - there are many arguments to fine-tune the build (see `gbp buildpackage --help` and `dpkg-buildpackage --help`), notable options: `-b` (binary-only, no source files), `-us` (unsigned source package), `-uc` (unsigned .buildinfo and .changes file), `--git-export-dir=<somedir>` (before building the package export the source there), for example:
+There are many arguments to fine-tune the build (see `gbp buildpackage --help` and `dpkg-buildpackage --help`), notable options: `-b` (binary-only, no source files), `-us` (unsigned source package), `-uc` (unsigned .buildinfo and .changes file), `--git-export-dir=<somedir>` (before building the package export the source there), for example:
 
 ```bash
 gbp buildpackage -b -us -uc
@@ -76,4 +76,4 @@ On successful build packages can now be found in the parent directory `ls ../*.d
 
 - [immich-native script](https://github.com/arter97/immich-native)
 - [immich-distribution snap](https://snapcraft.io/immich-distribution)
-- [immich for Proxmox VE](https://community-scripts.github.io/ProxmoxVE/scripts?id=immich)
+- [immich for Proxmox VE](https://community-scripts.org/scripts/immich)
