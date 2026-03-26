@@ -1,3 +1,9 @@
+immich (2.6.3-1) unstable; urgency=medium
+
+  * update to 2.6.3, see also https://github.com/immich-app/immich/releases/tag/v2.6.3
+
+ -- dionysius <dragon.dionysius@gmail.com>  Thu, 26 Mar 2026 20:16:15 +0100
+
 immich (2.6.2-1) unstable; urgency=medium
 
   * update to 2.6.2, see also https://github.com/immich-app/immich/releases/tag/v2.6.2
