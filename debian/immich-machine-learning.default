@@ -95,11 +95,11 @@ IMMICH_PORT=3003
 # Currently there are outdated and missing python dependencies in apt repos so
 # the service is run with uv. If possible we'd remove this in the future but
 # is unlikely with all the requirements including which python version is run.
-# more info: https://github.com/immich-app/immich/issues/15038
-# To avoid redownloading of newer python releases without a way to clean up it
-# is set to a specific release: https://github.com/astral-sh/uv/issues/15805
+# uv will download and verify dependencies as defined by the lock file.
+# Defaults are provided for cpu mode. You may need to customize some options to
+# make your hardware-acceleration work.
 # more options: https://docs.astral.sh/uv/reference/environment/#environment-variables
-# folders allowed to write
+# point uv paths to folders we are allowed to write
 UV_CACHE_DIR=/var/cache/immich/uv/cache
 UV_PROJECT_ENVIRONMENT=/var/cache/immich/uv/venv
 UV_PYTHON_INSTALL_DIR=/var/cache/immich/uv/python
@@ -117,8 +117,10 @@ UV_PYTHON_PREFERENCE=only-managed
 ### Other settings ###
 # Since this file exposes environment variables to the immich machine learning
 # service, any variable customization for modules can also be set here.
-# According to the immich docker source inference code for many gpu types benefit from mimalloc
-LD_PRELOAD=libmimalloc.so.3
+# According to the immich docker source, inference code for many gpu types
+# benefit from mimalloc. Recommended to be enabled but needs to be verified it
+# works with your hardware setup. Obtaining a never version may be beneficial.
+#LD_PRELOAD=libmimalloc.so.3
 # cache for everyone respecting XDG_CACHE_HOME
 XDG_CACHE_HOME=/var/cache/immich/.cache
 # cache for matplotlib

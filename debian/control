@@ -75,10 +75,10 @@ Pre-Depends: ${misc:Pre-Depends},
 # We compile stuff in uv so need a compiler and other headers
 Depends: g++,
          libgl-dev,
-         libmimalloc3,
          ${misc:Depends},
          ${shlibs:Depends},
-Recommends: ${misc:Recommends},
+Recommends: libmimalloc3 | libmimalloc2,
+            ${misc:Recommends},
 Built-Using: ${misc:Built-Using},
 Description: Self-hosted photo and video management solution - ML server
  Easily back up, organize, and manage your photos on your own server. immich
