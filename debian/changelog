@@ -1,3 +1,10 @@
+immich (2.6.3-2) unstable; urgency=medium
+
+  * use upstream-vcs-tag import so upstream git history doesn't get lost
+  * reduce mimalloc responsibility, remove/update outdated comments in machine-learning config
+
+ -- dionysius <dragon.dionysius@gmail.com>  Sun, 29 Mar 2026 15:38:34 +0200
+
 immich (2.6.3-1) unstable; urgency=medium
 
   * update to 2.6.3, see also https://github.com/immich-app/immich/releases/tag/v2.6.3
