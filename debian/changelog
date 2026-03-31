@@ -1,3 +1,9 @@
+immich (2.6.3-3) unstable; urgency=medium
+
+  * disable gunicorn control socket
+
+ -- dionysius <dragon.dionysius@gmail.com>  Wed, 01 Apr 2026 00:29:48 +0200
+
 immich (2.6.3-2) unstable; urgency=medium
 
   * use upstream-vcs-tag import so upstream git history doesn't get lost
