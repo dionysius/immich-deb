@@ -8,6 +8,7 @@ if [ "$1" = "configure" ] || [ "$1" = "abort-upgrade" ] || [ "$1" = "abort-decon
 
     # skip if shared_preload_libraries is active in any other file, trying to avoid breaking existing setups
     if grep -R -E "^shared_preload_libraries" "/etc/postgresql/$pgver/" --exclude='*immich-db-reqs*' -q; then
+      echo "immich-db-reqs: cannot automatically enable vchord for postgresql-$pgver: shared_preload_libraries is already configured elsewhere. Manual intervention required to add 'vchord' to shared_preload_libraries." >&2
       continue
     fi
 
