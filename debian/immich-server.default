@@ -130,3 +130,7 @@ NODE_ENV=production
 ### Other settings ###
 # Since this file exposes environment variables to the immich server service,
 # any variable customization for modules can also be set here. E.g.
+# According to the immich docker source, the Node.js server process benefits
+# from mimalloc. Recommended to be enabled but needs to be verified it works
+# with your setup. Obtaining a newer version may be beneficial.
+#LD_PRELOAD=libmimalloc.so.3

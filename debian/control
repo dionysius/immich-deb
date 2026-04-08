@@ -49,6 +49,7 @@ Depends: imagemagick,
          ${perl:Depends},
          ${shlibs:Depends},
 Recommends: immich-machine-learning,
+            libmimalloc3 | libmimalloc2,
             ${misc:Recommends},
 Built-Using: ${misc:Built-Using},
 Description: Self-hosted photo and video management solution - main server
