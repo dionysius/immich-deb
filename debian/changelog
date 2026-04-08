@@ -1,10 +1,11 @@
-immich (2.7.2-1) unstable; urgency=medium
+immich (2.7.2-2) unstable; urgency=medium
 
   * immich-db-reqs: warn to stderr if shared_preload_libraries is already configured
   * update to 2.7.0, see also https://github.com/immich-app/immich/releases/tag/v2.7.0
   * update to 2.7.2, see also https://github.com/immich-app/immich/releases/tag/v2.7.2
   * install new helmet.json file, add IMMICH_HELMET_FILE to config
   * prepare config to preload mimalloc in server
+  * exclude prebuilds from strip and shlibdeps
 
  -- dionysius <dragon.dionysius@gmail.com>  Wed, 08 Apr 2026 04:55:18 +0200
 
