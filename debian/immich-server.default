@@ -16,6 +16,8 @@ IMMICH_LOG_LEVEL=log
 IMMICH_MEDIA_LOCATION=/var/lib/immich/data
 # Path to config file
 #IMMICH_CONFIG_FILE=
+# Path to a json file with helmet options. Set to false to disable. Set to true to use default helmet.json
+#IMMICH_HELMET_FILE=false
 # Set to true to disable color-coded log output
 #NO_COLOR=false
 # When false disables the /auth/admin-sign-up endpoint
