@@ -17,7 +17,7 @@ export CI = 1
 export COREPACK_ENABLE_DOWNLOAD_PROMPT = 0
 
 # export dpkg variables for helper scripts
-export DEB_SOURCE DEB_VERSION DEB_VERSION_UPSTREAM DEB_BUILD_ARCH DEB_DISTRIBUTION DEB_VENDOR
+export DEB_SOURCE DEB_VERSION DEB_VERSION_UPSTREAM
 
 # make build-specific binaries available in PATH
 export PATH := $(CURDIR)/$(TMPBUILD)/bin:$(PATH)
@@ -33,6 +33,13 @@ EXTISM_JS_SHA256_aarch64 = 28cdffcb7d4e74b98401c738f1348b9977a2d860fa1613876250f
 BINARYEN_VERSION = 125
 BINARYEN_SHA256_x86_64 = 7c3bc16599c8274a04d34a504fe4be2047884f900e0e2da2f6fb9cd667183be4
 BINARYEN_SHA256_aarch64 = d0382de3c189a7cbb9fdda93e2966f4557f6a00f201e2c4937c27ca01cead4fc
+
+# convert host arch to node arch
+export NODE_ARCH = $(DEB_HOST_ARCH)
+# special cases where Debian arch doesn't directly map to node arch
+ifeq ($(DEB_HOST_ARCH),amd64)
+	export NODE_ARCH = x86
+endif
 
 # uv version to use (since debian has not packaged it yet)
 UV_VERSION = 0.9.30
@@ -136,6 +143,9 @@ override_dh_auto_build:
 # additionally we could write this file in service's startup using ExecStartPre if the long version names get annoying
 	mkdir -p $(TMPDEB)/usr/lib/immich/.build
 	echo "{}" > $(TMPDEB)/usr/lib/immich/.build/build-lock.json
+
+# Remove prebuilt native binaries for non-matching architectures in node dependencies
+	find $(TMPDEB)/usr/lib/immich -mindepth 1 -type d -regex ".*/prebuilds/[^/]+" ! -name "linux-$(NODE_ARCH)" -exec rm -r {} +
 
 override_dh_prep:
 	rm -rf $(TMPDEB)/build
