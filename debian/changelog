@@ -1,3 +1,10 @@
+immich (2.7.4-1) unstable; urgency=medium
+
+  * update to [2.7.4](https://github.com/immich-app/immich/releases/tag/v2.7.4)
+  * remove prebuilt native binaries for non-matching architectures in node dependencies
+
+ -- dionysius <dragon.dionysius@gmail.com>  Fri, 10 Apr 2026 22:04:42 +0200
+
 immich (2.7.3-1) unstable; urgency=medium
 
   * update to 2.7.3, see also https://github.com/immich-app/immich/releases/tag/v2.7.3
