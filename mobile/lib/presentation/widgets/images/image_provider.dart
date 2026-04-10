@@ -51,7 +51,7 @@ mixin CancellableImageProviderMixin<T extends Object> on CancellableImageProvide
     return null;
   }
 
-  Stream<ImageInfo> loadRequest(ImageRequest request, ImageDecoderCallback decode, {bool evictOnError = true}) async* {
+  Stream<ImageInfo> loadRequest(ImageRequest request, ImageDecoderCallback decode, {required bool isFinal}) async* {
     if (isCancelled) {
       this.request = null;
       return;
@@ -59,21 +59,18 @@ mixin CancellableImageProviderMixin<T extends Object> on CancellableImageProvide
 
     try {
       final image = await request.load(decode);
-      if (isCancelled) {
+      if (isCancelled || image == null) {
+        image?.dispose();
         return;
       }
-      if (image == null && evictOnError) {
-        PaintingBinding.instance.imageCache.evict(this);
-        return;
-      } else if (image == null) {
-        return;
-      }
+      isFinished = isFinal;
       yield image;
     } catch (e, stack) {
       if (isCancelled) {
         return;
       }
-      if (evictOnError) {
+      if (isFinal) {
+        isFinished = true;
         PaintingBinding.instance.imageCache.evict(this);
         rethrow;
       }
@@ -83,7 +80,7 @@ mixin CancellableImageProviderMixin<T extends Object> on CancellableImageProvide
     }
   }
 
-  Future<ui.Codec?> loadCodecRequest(ImageRequest request) async {
+  Future<ui.Codec?> loadCodecRequest(ImageRequest request, {required bool isFinal}) async {
     if (isCancelled) {
       this.request = null;
       return null;
@@ -91,20 +88,19 @@ mixin CancellableImageProviderMixin<T extends Object> on CancellableImageProvide
 
     try {
       final codec = await request.loadCodec();
-      if (isCancelled) {
+      if (isCancelled || codec == null) {
         codec?.dispose();
         return null;
       }
-      if (codec == null) {
-        PaintingBinding.instance.imageCache.evict(this);
-        return null;
-      }
+      isFinished = isFinal;
       return codec;
     } catch (e) {
-      if (!isCancelled) {
+      if (isFinal) {
+        isFinished = true;
         PaintingBinding.instance.imageCache.evict(this);
+        rethrow;
       }
-      rethrow;
+      return null;
     } finally {
       this.request = null;
     }
