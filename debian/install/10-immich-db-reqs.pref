@@ -1,0 +1,15 @@
+Explanation: Pin PostgreSQL extensions to immich-supported versions
+ Immich requires specific PostgreSQL extension version ranges that cannot be
+ expressed in package dependencies. Without pinning, apt attempts to install
+ the latest versions which may be incompatible. This preferences file tries
+ to limit upgrades to versions known to work with immich. Unfortunately this
+ is no bulletproof solution.
+ See also: https://docs.immich.app/administration/postgres-standalone/
+
+Package: postgresql-pgvector postgresql-18-pgvector postgresql-17-pgvector postgresql-16-pgvector
+Pin: version 0.8.*
+Pin-Priority: 995
+
+Package: postgresql-vchord postgresql-18-vchord postgresql-17-vchord postgresql-16-vchord
+Pin: version 1.0.*
+Pin-Priority: 995
