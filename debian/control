@@ -5,7 +5,6 @@ Priority: optional
 # >= 120 in 26.04 LTS, debian trixie is ready - IF this version is sufficient
 Build-Depends: curl,
                debhelper-compat (= 13),
-               gawk,
                help2man,
                libvips-dev (>= 8.17.2),
                nodejs (>= 24) | npm,
