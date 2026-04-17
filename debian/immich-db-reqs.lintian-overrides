@@ -1,0 +1,3 @@
+# packages should not do that. Since immich also defines upper limits of supported postgresql extensions
+# this is the only known way to keep an accidental upgrade in check.
+package-installs-apt-preferences
