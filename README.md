@@ -17,6 +17,8 @@ curl -fsSL https://apt.crunchy.run/immich/install.sh | sudo bash -
 sudo apt install immich
 ```
 
+_(For dependency errors, see the [Installation Wiki](https://github.com/dionysius/immich-deb/wiki/Installation) for additional requirements)_
+
 Alternatively, download prebuilt packages from the [releases section](https://github.com/dionysius/immich-deb/releases) and verify signatures with the [signing-key](signing-key.pub). Packages are automatically built in [Github Actions](https://github.com/dionysius/immich-deb/actions).
 
 ## Configuration
