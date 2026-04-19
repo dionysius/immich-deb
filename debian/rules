@@ -38,7 +38,7 @@ BINARYEN_SHA256_aarch64 = d0382de3c189a7cbb9fdda93e2966f4557f6a00f201e2c4937c27c
 export NODE_ARCH = $(DEB_HOST_ARCH)
 # special cases where Debian arch doesn't directly map to node arch
 ifeq ($(DEB_HOST_ARCH),amd64)
-	export NODE_ARCH = x86
+	export NODE_ARCH = x64
 endif
 
 # uv version to use (since debian has not packaged it yet)
