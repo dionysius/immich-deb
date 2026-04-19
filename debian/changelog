@@ -1,3 +1,10 @@
+immich (2.7.5-2) unstable; urgency=medium
+
+  * link to wiki for dependency errors
+  * immich-server: fix typo, keep npm prebuilds for x64, not x86
+
+ -- dionysius <dragon.dionysius@gmail.com>  Sun, 19 Apr 2026 23:09:21 +0200
+
 immich (2.7.5-1) unstable; urgency=medium
 
   * immich-db-reqs: define minimum versions for postgresql and its extensions
