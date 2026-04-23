@@ -93,14 +93,23 @@ BindReadOnlyPaths=/proc/cpuinfo
 
 # Namespace isolation
 PrivateTmp=disconnected
-# Allow hardware-accelerated transcoding.
-PrivateDevices=false
-# For more security with GPU access, use DevicePolicy with DeviceAllow:
-#DevicePolicy=closed
-#DeviceAllow=/dev/dri rw
-#DeviceAllow=/dev/nvidia* rw
 PrivateIPC=true
 PrivateBPF=true
+# Allow hardware-accelerated transcoding.
+PrivateDevices=true
+DevicePolicy=closed
+# Intel/AMD (VAAPI, QuickSync)
+DeviceAllow=/dev/dri rw
+# NVIDIA (NVENC, CUDA)
+DeviceAllow=/dev/nvidia* rw
+# AMD ROCm
+DeviceAllow=/dev/kfd rw
+# Rockchip SoC
+DeviceAllow=/dev/rga rw
+DeviceAllow=/dev/dma_heap rw
+DeviceAllow=/dev/mpp_service rw
+# ARM Mali
+DeviceAllow=/dev/mali0 rw
 
 # Kernel and system protection
 ProtectClock=true

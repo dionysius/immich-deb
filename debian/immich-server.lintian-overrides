@@ -2,7 +2,6 @@ script-not-executable [usr/lib/immich/server/dist/bin/*.d.ts]
 script-not-executable [usr/lib/immich/server/dist/bin/*.js]
 
 # prebuilt binaries
-binary-from-other-architecture [usr/lib/immich/server/node_modules/*/bcrypt/prebuilds/*]
 library-not-linked-against-libc [usr/lib/immich/server/node_modules/*/bcrypt/prebuilds/*]
 
 # irrelevant documentation files
@@ -24,6 +23,7 @@ package-contains-eslint-config-file [usr/lib/immich/server/node_modules/*]
 package-contains-npm-ignore-file [usr/lib/immich/server/node_modules/*]
 package-contains-vcs-control-file [usr/lib/immich/server/node_modules/*]
 embedded-javascript-library * [usr/lib/immich/server/node_modules/*]
+unstripped-binary-or-object [usr/lib/immich/server/node_modules/*]
 
 # impossible to filter selectively due to the way pnpm stores the files (mostly duplicates of above)
 binary-from-other-architecture [usr/lib/immich/server/.pnpm-store/*]
