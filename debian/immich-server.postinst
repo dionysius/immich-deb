@@ -2,8 +2,6 @@
 set -e
 
 if [ "$1" = "configure" ]; then
-  adduser --system --group --quiet --no-create-home --home /var/lib/immich immich >/dev/null || true
-
   if [ -f /etc/default/immich-server ]; then
     if ! dpkg-statoverride --list /etc/default/immich-server >/dev/null 2>&1; then
       chown root:immich /etc/default/immich-server
