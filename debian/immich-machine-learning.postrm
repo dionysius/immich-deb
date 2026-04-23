@@ -1,6 +1,15 @@
 #!/bin/sh
 set -e
 
+# Abort upgrade from < 2.7.5-4~: restore migrated config file back to original location
+if [ "$1" = "abort-upgrade" ] && dpkg --compare-versions "$2" lt "2.7.5-4~"; then
+  if [ -f /etc/immich/machine-learning.env.dpkg-migration ]; then
+    mv -f /etc/immich/machine-learning.env.dpkg-migration /etc/default/immich-machine-learning
+  elif [ -f /etc/immich/machine-learning.env ]; then
+    mv -f /etc/immich/machine-learning.env /etc/default/immich-machine-learning
+  fi
+fi
+
 #DEBHELPER#
 
 if [ "$1" = "purge" ]; then

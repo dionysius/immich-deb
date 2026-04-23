@@ -1,0 +1,16 @@
+# Default settings for immich-server. This file is sourced by the immich-server
+# systemd service. Intended for runtime environment configuration.
+# Do not set immich variables here - use /etc/immich/server.env instead.
+
+# Timezone should be set to a TZ identifier from this list: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List
+# TZ is used by exiftool as a fallback in case the timezone cannot be determined
+TZ=Etc/UTC
+
+# Customize the NodeJS runtime environment (see also: https://nodejs.org/api/cli.html#environment-variables_1)
+NODE_ENV=production
+#NODE_OPTIONS=
+
+# According to the immich docker source, the Node.js server process benefits
+# from mimalloc. Recommended to be enabled but needs to be verified it works
+# with your setup. Obtaining a newer version may be beneficial.
+#LD_PRELOAD=libmimalloc.so.3

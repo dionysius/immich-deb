@@ -1,0 +1,16 @@
+#!/bin/sh
+set -e
+
+# Downgrade to < 2.7.5-4~: move config file back and hand ownership to conffiles early
+if [ "$1" = "upgrade" ] && dpkg --compare-versions "$2" lt "2.7.5-4~"; then
+  ucf --purge /etc/default/immich-server
+  ucfr --purge immich-server /etc/default/immich-server
+  ucf --purge /etc/immich/server.env
+  ucfr --purge immich-server /etc/immich/server.env
+
+  if [ -f /etc/immich/server.env ]; then
+    mv -f /etc/immich/server.env /etc/default/immich-server
+  fi
+fi
+
+#DEBHELPER#

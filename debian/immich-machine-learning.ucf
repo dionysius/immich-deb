@@ -1,0 +1,2 @@
+/usr/share/immich/system/machine-learning.default /etc/default/immich-machine-learning
+/usr/share/immich/system/machine-learning.env /etc/immich/machine-learning.env

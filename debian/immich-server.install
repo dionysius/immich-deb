@@ -1,5 +1,7 @@
 build.env usr/share/doc/immich-server
 debian/wrappers/immich-admin usr/sbin
+install/system/server.default usr/share/immich/system
+install/system/server.env usr/share/immich/system
 plugins/dist usr/share/immich/plugins
 plugins/manifest.json usr/share/immich/plugins
 server/bin/get-cpus.sh usr/lib/immich/server/bin

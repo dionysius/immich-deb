@@ -1,0 +1,2 @@
+#Type Path           Mode User   Group  Age Argument
+d     /etc/immich    0500 immich immich -   -

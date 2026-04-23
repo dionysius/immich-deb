@@ -36,10 +36,24 @@ Description: Self-hosted photo and video management solution - All-In-One
  This metapackage installs all immich server components along with the
  PostgreSQL database including extensions and Redis server.
 
+Package: immich-common
+Architecture: all
+Pre-Depends: ${misc:Pre-Depends},
+Depends: ${misc:Depends},
+Recommends: ${misc:Recommends},
+Description: Self-hosted photo and video management solution - common files
+ Easily back up, organize, and manage your photos on your own server. immich
+ helps you browse, search and organize your photos and videos with ease,
+ without sacrificing your privacy.
+ .
+ This package contains common files shared between immich components,
+ including the system user, group, and configuration directory.
+
 Package: immich-server
 Architecture: any
 Pre-Depends: ${misc:Pre-Depends},
 Depends: imagemagick,
+         immich-common,
          immich-geo-data,
          immich-web-data (= ${source:Version}),
          jellyfin-ffmpeg7 | ffmpeg,
@@ -75,6 +89,7 @@ Pre-Depends: ${misc:Pre-Depends},
 #          ... and maybe more
 # We compile stuff in uv so need a compiler and other headers
 Depends: g++,
+         immich-common,
          libgl-dev,
          ${misc:Depends},
          ${shlibs:Depends},

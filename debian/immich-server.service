@@ -1,34 +1,37 @@
+# Please consider only editing this file through systemd drop-in files
+# (e.g. `systemctl edit immich-server`). This will enable you to get updates
+# to this file automatically, without your overrides being lost.
+
+# Refer to the manpage `systemd.unit` for detailed documentation on each option.
 [Unit]
 Description=immich main server
 Documentation=https://github.com/immich-app/immich
+# The service requires network interfaces to be configured.
 After=network.target
+# If you want to expose the server to the network directly, you may find the following useful:
+#After=network-online.target
 
-# To add dependencies on local services (immich-machine-learning, postgresql, redis),
-# use `systemctl edit immich-server.service` and add the required After=/Requires= directives.
-# Example:
-#   [Unit]
-#   After=immich-machine-learning.service postgresql.service redis.service
-#   Requires=immich-machine-learning.service postgresql.service redis.service
+# If immich-machine-learning, postgresql and/or redis are running on this system they should be specified as dependencies,
+# such that immich-server is only started after (`After=`) those have successfully (`Requires=`) started.
+#After=immich-machine-learning.service postgresql.service redis.service
+#Requires=immich-machine-learning.service postgresql.service redis.service
 
+# If running immich behind a reverse proxy - running on this system - consider ordering it before also:
+#Before=theproxy.service
+
+# Refer to the manpages `systemd.service` and `systemd.exec` for detailed documentation on each option.
 [Service]
-# The user/group immich server is run under
-User=immich
-Group=immich
-# Any files created are only owned by user and group immich
-UMask=0007
-
-# Directories used by the service
-StateDirectory=immich immich/data immich/plugins
-# Permissions only for user and group immich
-StateDirectoryMode=0750
-
-# The location of the env file for configuration
+## Service execution environment
+# Service configuration file.
 EnvironmentFile=/etc/default/immich-server
 # build info
 EnvironmentFile=/usr/share/doc/immich-server/build.env
-
-# Start the server
+# Service execution.
+Type=exec
 ExecStart=/bin/sh -c ' \
+  set -a; \
+  . /etc/immich/server.env; \
+  set +a; \
   if [ -z "$UV_THREADPOOL_SIZE" ]; then \
     CPU_CORES=$(/usr/lib/immich/server/bin/get-cpus.sh); \
     if [ "$CPU_CORES" -gt 4 ]; then \
@@ -38,12 +41,22 @@ ExecStart=/bin/sh -c ' \
   LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/jellyfin-ffmpeg/lib \
   PATH=/usr/lib/jellyfin-ffmpeg:$PATH \
   exec node dist/main "$@"'
-# Set the working directory
 WorkingDirectory=/usr/lib/immich/server
-
 # Restart on failure
 Restart=on-failure
 RestartSec=5s
+
+## Permissions and directories
+User=immich
+Group=immich
+# Read-only configuration directory (read-only mount, permissions managed by tmpfiles, warns if mode differs).
+ConfigurationDirectory=immich::ro
+ConfigurationDirectoryMode=0500
+# Writable directories (read-write for the service, read-only for the group, reapplies permissions recursively if different).
+StateDirectory=immich immich/data immich/plugins
+StateDirectoryMode=0750
+# File creation mask (matching modes above).
+UMask=0027
 
 # Basic security hardening
 NoNewPrivileges=yes

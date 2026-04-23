@@ -1,13 +1,34 @@
 #!/bin/sh
 set -e
 
-if [ "$1" = "configure" ]; then
+# Abort downgrade to < 2.7.5-4~: restore config file
+if [ "$1" = "abort-upgrade" ] && dpkg --compare-versions "$2" lt "2.7.5-4~"; then
   if [ -f /etc/default/immich-machine-learning ]; then
-    if ! dpkg-statoverride --list /etc/default/immich-machine-learning >/dev/null 2>&1; then
-      chown root:immich /etc/default/immich-machine-learning
-      chmod 0640 /etc/default/immich-machine-learning
-    fi
+    mv -f /etc/default/immich-machine-learning /etc/immich/machine-learning.env
   fi
+fi
+
+# Finalize upgrade from < 2.7.5-4~: restore saved config before UCF runs
+if [ "$1" = "configure" ] && dpkg --compare-versions "$2" lt "2.7.5-4~"; then
+  if [ -f /etc/immich/machine-learning.env.dpkg-migration ]; then
+    mv -f /etc/immich/machine-learning.env.dpkg-migration /etc/immich/machine-learning.env
+  fi
+  # Remove old statoverride (no longer needed - file is not sensitive)
+  if dpkg-statoverride --list /etc/default/immich-machine-learning >/dev/null 2>&1; then
+    dpkg-statoverride --remove /etc/default/immich-machine-learning || true
+  fi
+  # Reset to standard permissions for /etc/default files
+  if [ -f /etc/default/immich-machine-learning ]; then
+    chown root:root /etc/default/immich-machine-learning
+    chmod 0644 /etc/default/immich-machine-learning
+  fi
+fi
+
+# Always provide --three-way for ucf comparison (unable to configure, rest of dh_ucf still valid and
+# it should not prompt twice for the same file since the original is cached by ucf)
+if [ "$1" = "configure" ]; then
+  ucf --three-way /usr/share/immich/system/machine-learning.default /etc/default/immich-machine-learning
+  ucf --three-way /usr/share/immich/system/machine-learning.env /etc/immich/machine-learning.env
 fi
 
 #DEBHELPER#

@@ -1,2 +1,0 @@
-#Type Name   ID GECOS                               Home directory  Shell
-u     immich -  "immich photo and video management" /var/lib/immich /usr/sbin/nologin

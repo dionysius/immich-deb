@@ -1,0 +1,11 @@
+#!/bin/sh
+set -e
+
+# Prepare upgrade from < 2.7.5-4~: move config file for migration
+if [ "$1" = "upgrade" ] && dpkg --compare-versions "$2" lt "2.7.5-4~"; then
+  if [ -f /etc/default/immich-server ]; then
+    mv -f /etc/default/immich-server /etc/immich/server.env.dpkg-migration
+  fi
+fi
+
+#DEBHELPER#

@@ -1,0 +1,13 @@
+#!/bin/sh
+set -e
+
+# Abort upgrade from < 2.7.5-4~: restore migrated config file back to original location
+if [ "$1" = "abort-upgrade" ] && dpkg --compare-versions "$2" lt "2.7.5-4~"; then
+  if [ -f /etc/immich/server.env.dpkg-migration ]; then
+    mv -f /etc/immich/server.env.dpkg-migration /etc/default/immich-server
+  elif [ -f /etc/immich/server.env ]; then
+    mv -f /etc/immich/server.env /etc/default/immich-server
+  fi
+fi
+
+#DEBHELPER#

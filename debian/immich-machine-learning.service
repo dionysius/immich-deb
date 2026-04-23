@@ -1,31 +1,46 @@
+# Please consider only editing this file through systemd drop-in files
+# (e.g. `systemctl edit immich-machine-learning`). This will enable you to get updates
+# to this file automatically, without your overrides being lost.
+
+# Refer to the manpage `systemd.unit` for detailed documentation on each option.
 [Unit]
 Description=immich machine-learning server
 Documentation=https://github.com/immich-app/immich
+# The service requires network interfaces to be configured.
 After=network.target
+# If you want to expose the server to the network directly, you may find the following useful:
+#After=network-online.target
 
+# Refer to the manpages `systemd.service` and `systemd.exec` for detailed documentation on each option.
 [Service]
-# The user/group immich machine-learning server is run under
-User=immich
-Group=immich
-# Any files created are only owned by user and group immich
-UMask=0007
-
-# Directories used by the service
-CacheDirectory=immich
-
-# The location of the env file for configuration
+## Service execution environment
+# Service configuration file.
 EnvironmentFile=/etc/default/immich-machine-learning
 # build info
 EnvironmentFile=/usr/share/doc/immich-machine-learning/build.env
-
-# Start the server
-ExecStart=/usr/lib/immich/machine-learning/bin/uv run --extra $DEVICE -m immich_ml
-# Set the working directory
+# Service execution.
+Type=exec
+ExecStart=/bin/sh -c ' \
+  set -a; \
+  . /etc/immich/machine-learning.env; \
+  set +a; \
+  exec /usr/lib/immich/machine-learning/bin/uv run --extra $DEVICE -m immich_ml'
 WorkingDirectory=/usr/lib/immich/machine-learning
-
 # Restart on failure
 Restart=on-failure
 RestartSec=5s
+
+## Permissions and directories
+User=immich
+Group=immich
+# Read-only configuration directory (read-only mount, permissions managed by tmpfiles, warns if mode differs).
+ConfigurationDirectory=immich::ro
+ConfigurationDirectoryMode=0500
+# Writable directories (read-write for the service, read-only for the group, reapplies permissions recursively if different).
+CacheDirectory=immich
+CacheDirectoryMode=0750
+# File creation mask (matching modes above).
+UMask=0027
 
 # Basic security hardening
 NoNewPrivileges=yes

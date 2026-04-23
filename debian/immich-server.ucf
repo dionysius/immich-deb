@@ -1,0 +1,2 @@
+/usr/share/immich/system/server.default /etc/default/immich-server
+/usr/share/immich/system/server.env /etc/immich/server.env
