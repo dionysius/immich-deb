@@ -1,0 +1,24 @@
+immich-server (2.7.5-4) unstable; urgency=medium
+
+  Restructured the service after discovering that configured immich environment
+  variables were accessible through the systemd D-Bus interface. Any
+  unprivileged local system user could query the D-Bus interface to read
+  sensitive configuration values.
+
+  * The main configuration file has moved from `/etc/default/immich-server` to
+    `/etc/immich/server.env`. Any local modifications are
+    automatically preserved by the package upgrade. It is advised to diff and
+    obtain maintainer changes for better organisation, but they are
+    not critical. Non-immich settings have moved to
+    `/etc/default/immich-server`.
+  * Config file changes are now managed with `ucf` with the three-way option.
+    Starting with the next upgrade, you will have the option to use three-way
+    diff and merge which can help preserve your local changes while
+    incorporating maintainer and upstream updates.
+  * Additionally the systemd service file now includes several sandboxing
+    features to isolate the service better. Permissions on `/etc/immich`,
+    `/var/lib/immich` and `/var/lib/immich/data` have also been
+    tightened to isolate config and data better. It is advised to review and
+    obtain maintainer changes if you have customized the systemd service file.
+
+ -- dionysius <dragon.dionysius@gmail.com>  Thu, 23 Apr 2026 07:25:33 +0200

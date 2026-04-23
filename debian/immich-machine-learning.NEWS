@@ -1,0 +1,22 @@
+immich-machine-learning (2.7.5-4) unstable; urgency=medium
+
+  While the machine-learning service does not contain sensitive information,
+  the same organisational changes have been made for consistency.
+
+  * The main configuration file has moved from `/etc/default/immich-machine-learning`
+    to `/etc/immich/machine-learning.env`. Any local modifications are
+    automatically preserved by the package upgrade. It is advised to diff and
+    obtain maintainer changes for better organisation. uv and other non-immich
+    settings have moved to `/etc/default/immich-machine-learning` and
+    customized options should be manually transferred there as well.
+  * Config file changes are now managed with `ucf` with the three-way option.
+    Starting with the next upgrade, you will have the option to use three-way
+    diff and merge which can help preserve your local changes while
+    incorporating maintainer and upstream updates.
+  * Additionally the systemd service file now includes several sandboxing
+    features to isolate the service better. Permissions on `/etc/immich`,
+    `/var/cache/immich` have also been tightened to isolate config and data
+    better. It is advised to review and obtain maintainer changes if you have
+    customized the systemd service file.
+
+ -- dionysius <dragon.dionysius@gmail.com>  Thu, 23 Apr 2026 07:25:33 +0200

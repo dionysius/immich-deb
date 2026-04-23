@@ -10,6 +10,9 @@ TZ=Etc/UTC
 NODE_ENV=production
 #NODE_OPTIONS=
 
+# libuv thread pool size for async I/O operations (default: num cores, min 4)
+#UV_THREADPOOL_SIZE=8
+
 # According to the immich docker source, the Node.js server process benefits
 # from mimalloc. Recommended to be enabled but needs to be verified it works
 # with your setup. Obtaining a newer version may be beneficial.

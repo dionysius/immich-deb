@@ -9,15 +9,19 @@ fi
 
 cd /usr/lib/immich/server
 
-CPU_CORES=$(./bin/get-cpus.sh)
-if [ "$CPU_CORES" -gt 4 ]; then
-  export UV_THREADPOOL_SIZE=$CPU_CORES
-fi
-export PATH="/usr/lib/jellyfin-ffmpeg:$PATH"
-export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/usr/lib/jellyfin-ffmpeg/lib"
-
 set -a
 . /etc/default/immich-server
+. /etc/immich/server.env
 set +a
+
+if [ -z "$UV_THREADPOOL_SIZE" ]; then
+  CPU_CORES=$(./bin/get-cpus.sh)
+  if [ "$CPU_CORES" -gt 4 ]; then
+    export UV_THREADPOOL_SIZE=$CPU_CORES
+  fi
+fi
+
+export PATH="/usr/lib/jellyfin-ffmpeg:$PATH"
+export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/usr/lib/jellyfin-ffmpeg/lib"
 
 exec node --no-warnings dist/main immich-admin "$@"
