@@ -23,6 +23,7 @@ jobs:
       images: '["debian:stable", "ubuntu:latest", "ubuntu:oldlts"]'
       architectures: '["amd64", "arm64"]'
       before_build_deps_install: |
+        apt-get install -y curl
         curl -fsSL https://deb.nodesource.com/setup_24.x | bash -
         . /etc/os-release
         if { [ "$ID" = "debian" ] && dpkg --compare-versions "$VERSION_ID" le "13"; } || \
