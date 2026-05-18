@@ -24,12 +24,15 @@ jobs:
       architectures: '["amd64", "arm64"]'
       before_build_deps_install: |
         curl -fsSL https://deb.nodesource.com/setup_24.x | bash -
-        curl -fsSL https://build.opensuse.org/projects/home:dionysius:immich/signing_keys/download?kind=gpg | gpg --dearmor -o /etc/apt/keyrings/obs-dionysius.key
         . /etc/os-release
-        dist="${ID^}_${VERSION_ID}"
-        [[ "$dist" == Ubuntu* ]] && dist="x${dist}"
-        echo "deb [signed-by=/etc/apt/keyrings/obs-dionysius.key] https://download.opensuse.org/repositories/home:/dionysius:/immich/$dist/ /" | tee /etc/apt/sources.list.d/obs-dionysius.list
-        apt-get update
+        if { [ "$ID" = "debian" ] && dpkg --compare-versions "$VERSION_ID" le "13"; } || \
+           { [ "$ID" = "ubuntu" ] && dpkg --compare-versions "$VERSION_ID" le "24.04"; }; then
+          curl -fsSL https://build.opensuse.org/projects/home:dionysius:immich/signing_keys/download?kind=gpg | gpg --dearmor -o /etc/apt/keyrings/obs-dionysius.key
+          dist="${ID^}_${VERSION_ID}"
+          [[ "$dist" == Ubuntu* ]] && dist="x${dist}"
+          echo "deb [signed-by=/etc/apt/keyrings/obs-dionysius.key] https://download.opensuse.org/repositories/home:/dionysius:/immich/$dist/ /" | tee /etc/apt/sources.list.d/obs-dionysius.list
+          apt-get update
+        fi
 
   release:
     if: startsWith(github.event.ref, 'refs/tags/debian')

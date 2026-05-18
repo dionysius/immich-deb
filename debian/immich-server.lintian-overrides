@@ -1,9 +1,6 @@
 script-not-executable [usr/lib/immich/server/dist/bin/*.d.ts]
 script-not-executable [usr/lib/immich/server/dist/bin/*.js]
 
-# prebuilt binaries
-library-not-linked-against-libc [usr/lib/immich/server/node_modules/*/bcrypt/prebuilds/*]
-
 # irrelevant documentation files
 privacy-breach-generic * [usr/lib/immich/server/node_modules/*/fluent-ffmpeg/doc/*]
 

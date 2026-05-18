@@ -63,7 +63,7 @@ Depends: imagemagick,
          ${perl:Depends},
          ${shlibs:Depends},
 Recommends: immich-machine-learning,
-            libmimalloc3 | libmimalloc2,
+            libmimalloc3 | libmimalloc2.0,
             ${misc:Recommends},
 Built-Using: ${misc:Built-Using},
 Description: Self-hosted photo and video management solution - main server
@@ -93,7 +93,7 @@ Depends: g++,
          libgl-dev,
          ${misc:Depends},
          ${shlibs:Depends},
-Recommends: libmimalloc3 | libmimalloc2,
+Recommends: libmimalloc3 | libmimalloc2.0,
             ${misc:Recommends},
 Built-Using: ${misc:Built-Using},
 Description: Self-hosted photo and video management solution - ML server
@@ -151,7 +151,7 @@ Package: immich-db-reqs
 Architecture: all
 Pre-Depends: ${misc:Pre-Depends},
 # https://docs.immich.app/administration/postgres-standalone/#prerequisites -> supported versions
-Depends: postgresql (>= 16),
+Depends: postgresql-18 | postgresql-17 | postgresql-16,
          postgresql-pgvector (>= 0.7) | postgresql-18-pgvector (>= 0.7) | postgresql-17-pgvector (>= 0.7) | postgresql-16-pgvector (>= 0.7),
          postgresql-vchord (>= 0.3) | postgresql-18-vchord (>= 0.3) | postgresql-17-vchord (>= 0.3) | postgresql-16-vchord (>= 0.3),
          ${misc:Depends},
