@@ -15,7 +15,7 @@ After=network.target
 [Service]
 ## Service execution environment
 # Service configuration file.
-EnvironmentFile=/etc/default/immich-machine-learning
+EnvironmentFile=-%E/default/immich-machine-learning
 # build info
 EnvironmentFile=/usr/share/doc/immich-machine-learning/build.env
 # Service execution.

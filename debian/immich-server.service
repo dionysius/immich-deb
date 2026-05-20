@@ -23,7 +23,7 @@ After=network.target
 [Service]
 ## Service execution environment
 # Service configuration file.
-EnvironmentFile=/etc/default/immich-server
+EnvironmentFile=-%E/default/immich-server
 # build info
 EnvironmentFile=/usr/share/doc/immich-server/build.env
 # Service execution.
