@@ -2,6 +2,11 @@
 # immich-machine-learning systemd service. Intended for runtime environment configuration.
 # Do not set immich variables here - use /etc/immich/machine-learning.env instead.
 
+# Set to true to disable color-coded log output
+#NO_COLOR=false
+# Hardware acceleration mode (one of [armnn, cuda, cpu, rocm, openvino, rknn])
+DEVICE=cpu
+
 # Currently there are outdated and missing python dependencies in apt repos so
 # the service is run with uv. If possible we'd remove this in the future but
 # is unlikely with all the requirements including which python version is run.
