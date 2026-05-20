@@ -1,3 +1,12 @@
+immich (2.7.5-5) unstable; urgency=medium
+
+  * build metadata: update immich source url to reflect updated source import tag
+  * Reduce release waiting period to 3 days
+  * add short notes and references when using alternative local folders
+  * also move DEVICE directive to defaults file for machine-learning (tightly coupled with uv settings)
+
+ -- dionysius <dragon.dionysius@gmail.com>  Wed, 20 May 2026 16:47:26 +0200
+
 immich (2.7.5-4) unstable; urgency=medium
 
   * use sysusers to manage user, group and membership
