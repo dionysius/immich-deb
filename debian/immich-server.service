@@ -90,9 +90,7 @@ SecureBits=noroot noroot-locked
 ProtectSystem=strict
 ProtectHome=true
 ProtectProc=noaccess
-ProcSubset=pid
-# Allow reading CPU info for automatic UV_THREADPOOL_SIZE calculation
-BindReadOnlyPaths=/proc/cpuinfo
+# ProcSubset=pid # not possible right now, get-cpus.sh wants to read /proc/cpuinfo
 
 # Namespace isolation
 PrivateTmp=disconnected
