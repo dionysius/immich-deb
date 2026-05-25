@@ -1,3 +1,10 @@
+immich (2.7.5-6) unstable; urgency=medium
+
+  * ProcSubset is not possible right now, get-cpus.sh wants to read /proc/cpuinfo
+  * remove symlinks which were accidentally left active
+
+ -- dionysius <dragon.dionysius@gmail.com>  Tue, 26 May 2026 01:38:59 +0200
+
 immich (2.7.5-5) unstable; urgency=medium
 
   * build metadata: update immich source url to reflect updated source import tag
