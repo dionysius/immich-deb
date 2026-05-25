@@ -1,15 +1,15 @@
 #!/bin/sh
 set -e
 
-# Abort downgrade to < 2.7.5-4~: restore config file
-if [ "$1" = "abort-upgrade" ] && dpkg --compare-versions "$2" lt "2.7.5-4~"; then
-  if [ -f /etc/default/immich-machine-learning ]; then
-    mv -f /etc/default/immich-machine-learning /etc/immich/machine-learning.env
+# Abort downgrade to < 2.7.5-6~: restore config file
+if [ "$1" = "abort-upgrade" ] && dpkg --compare-versions "$2" lt "2.7.5-6~"; then
+  if [ -f /etc/immich/machine-learning.env.dpkg-migration ]; then
+    mv -f /etc/immich/machine-learning.env.dpkg-migration /etc/default/immich-machine-learning
   fi
 fi
 
-# Finalize upgrade from < 2.7.5-4~: restore saved config before UCF runs
-if [ "$1" = "configure" ] && dpkg --compare-versions "$2" lt "2.7.5-4~"; then
+# Finalize upgrade from < 2.7.5-6~: restore saved config before UCF runs
+if [ "$1" = "configure" ] && dpkg --compare-versions "$2" lt "2.7.5-6~"; then
   if [ -f /etc/immich/machine-learning.env.dpkg-migration ]; then
     mv -f /etc/immich/machine-learning.env.dpkg-migration /etc/immich/machine-learning.env
   fi

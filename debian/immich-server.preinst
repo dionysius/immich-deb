@@ -1,9 +1,15 @@
 #!/bin/sh
 set -e
 
-# Prepare upgrade from < 2.7.5-4~: move config file for migration
-if [ "$1" = "upgrade" ] && dpkg --compare-versions "$2" lt "2.7.5-4~"; then
-  if [ -f /etc/default/immich-server ]; then
+# Prepare upgrade from < 2.7.5-6~: backup and move config file for migration
+if [ "$1" = "upgrade" ] && dpkg --compare-versions "$2" lt "2.7.5-6~"; then
+  if [ -f /etc/default/immich-server ] && [ ! -L /etc/default/immich-server ]; then
+    cp -f /etc/default/immich-server /etc/default/immich-server.dpkg-bak
+  fi
+  if [ -f /etc/immich/server.env ] && [ ! -L /etc/immich/server.env ]; then
+    cp -f /etc/immich/server.env /etc/immich/server.env.dpkg-bak
+  fi
+  if [ -L /etc/immich/server.env ] && [ -f /etc/default/immich-server ]; then
     mv -f /etc/default/immich-server /etc/immich/server.env.dpkg-migration
   fi
 fi

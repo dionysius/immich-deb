@@ -1,4 +1,3 @@
-etc/default/immich-server etc/immich/server.env
 # satisfy weird "builddir" concept of immich
 usr/share/immich/geo usr/lib/immich/.build/geodata
 usr/share/immich/plugins usr/lib/immich/.build/corePlugin
