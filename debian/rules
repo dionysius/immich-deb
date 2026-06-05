@@ -46,6 +46,14 @@ UV_VERSION = 0.9.30
 UV_SHA256_x86_64 = 8b3762374972daa7a74bbc6896cc73229ca69a07403dd9f9ea3805a51ffd7582
 UV_SHA256_aarch64 = 6aadf3c71600d594e16dabf382cc15282ead4c5ca768599b6bcb43c5004d9aa8
 
+# Detect systemd major version for service file templating.
+# On bookworm systemd.pc ships with the systemd package; on newer distros it moved to systemd-dev.
+# TODO: once bookworm is phased out, add systemd-dev to Build-Depends and drop the dpkg-query fallback.
+SYSTEMD_MAJOR := $(shell pkgconf --modversion systemd 2>/dev/null)
+ifeq ($(SYSTEMD_MAJOR),)
+SYSTEMD_MAJOR := $(shell dpkg-query -W -f='$${Version}' libsystemd0 2>/dev/null | cut -d. -f1)
+endif
+
 # steps mostly imitate official docker images, so changes there may need to be reflected here
 # - https://github.com/immich-app/base-images/blob/main/server/Dockerfile
 # - https://github.com/immich-app/immich/blob/main/server/Dockerfile
@@ -152,6 +160,10 @@ override_dh_prep:
 	dh_prep -X $(TMPDEB)
 
 # Don't automatically start immich-server on installation it requires configuration first but restart on upgrade if it was running
+execute_before_dh_installsystemd:
+	fypp -DSYSTEMD_MAJOR=$(SYSTEMD_MAJOR) debian/immich-server.service.fypp debian/immich-server.service
+	fypp -DSYSTEMD_MAJOR=$(SYSTEMD_MAJOR) debian/immich-machine-learning.service.fypp debian/immich-machine-learning.service
+
 override_dh_installsystemd:
 	dh_installsystemd -pimmich-server --no-start --restart-after-upgrade
 	dh_installsystemd -pimmich-machine-learning
