@@ -6,6 +6,7 @@ Priority: optional
 Build-Depends: curl,
                debhelper-compat (= 13),
                dh-sequence-installsysusers,
+               fypp:native,
                help2man,
                libvips-dev (>= 8.17.2),
                nodejs (>= 24) | npm,
