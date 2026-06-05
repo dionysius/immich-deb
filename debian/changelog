@@ -1,3 +1,9 @@
+immich (2.7.5-7) unstable; urgency=medium
+
+  * Add systed file templating, every distro build has now better fitting systemd directives
+
+ -- dionysius <dragon.dionysius@gmail.com>  Fri, 05 Jun 2026 15:27:35 +0200
+
 immich (2.7.5-6) unstable; urgency=medium
 
   * ProcSubset is not possible right now, get-cpus.sh wants to read /proc/cpuinfo
