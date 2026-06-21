@@ -2,11 +2,10 @@ build.env usr/share/doc/immich-server
 debian/install/system/server.default usr/share/immich/system
 debian/install/system/server.env usr/share/immich/system
 debian/wrappers/immich-admin usr/sbin
-plugins/dist usr/share/immich/plugins
-plugins/manifest.json usr/share/immich/plugins
+packages/plugin-core/dist usr/share/immich/plugin-core
+packages/plugin-core/manifest.json usr/share/immich/plugin-core
 server/bin/get-cpus.sh usr/lib/immich/server/bin
 usr/lib/immich/.build/build-lock.json
-usr/lib/immich/server/.pnpm-store
 usr/lib/immich/server/dist
 usr/lib/immich/server/helmet.json
 usr/lib/immich/server/node_modules
