@@ -7,12 +7,8 @@ privacy-breach-generic * [usr/lib/immich/server/node_modules/*/fluent-ffmpeg/doc
 # no code
 no-code-sections [usr/lib/immich/server/node_modules/*/sharp/*]
 
-# python cache
-package-installs-python-pycache-dir  [usr/lib/immich/server/node_modules/*/node-gyp/gyp/*]
-
 # for now we allow hardlinks from pnpm (hopefully unlikely that admins put immich folders on different filesystems)
 package-contains-hardlink pointing to: usr/lib/immich/server/node_modules/.pnpm/*
-package-contains-hardlink pointing to: usr/lib/immich/server/.pnpm-store/*
 
 # unreasonable to filter selectively due to amount of packages affected
 executable-not-elf-or-script [usr/lib/immich/server/node_modules/*]
@@ -22,18 +18,7 @@ package-contains-vcs-control-file [usr/lib/immich/server/node_modules/*]
 embedded-javascript-library * [usr/lib/immich/server/node_modules/*]
 unstripped-binary-or-object [usr/lib/immich/server/node_modules/*]
 
-# impossible to filter selectively due to the way pnpm stores the files (mostly duplicates of above)
-binary-from-other-architecture [usr/lib/immich/server/.pnpm-store/*]
-executable-not-elf-or-script [usr/lib/immich/server/.pnpm-store/*]
-library-not-linked-against-libc [usr/lib/immich/server/.pnpm-store/*]
-missing-dep-for-interpreter * [usr/lib/immich/server/.pnpm-store/*]
-missing-dependency-on-libc needed by usr/lib/immich/server/.pnpm-store/*
-no-code-sections [usr/lib/immich/server/.pnpm-store/*]
-python3-script-but-no-python3-dep * [usr/lib/immich/server/.pnpm-store/*]
-script-not-executable [usr/lib/immich/server/.pnpm-store/*]
-shared-library-is-executable 0755 [usr/lib/immich/server/.pnpm-store/*]
-unstripped-binary-or-object [usr/lib/immich/server/.pnpm-store/*]
-
-# if pnpm is on package-import-method=copy
-# python3-script-but-no-python3-dep * [usr/lib/immich/server/node_modules/.pnpm/node-gyp*]
-# script-not-executable [usr/lib/immich/server/node_modules/*]
+# pnpm stores all deps self-contained under node_modules/.pnpm; node-gyp ships
+# its python-based gyp build tool which is unused at runtime
+python3-script-but-no-python3-dep * [usr/lib/immich/server/node_modules/.pnpm/node-gyp*]
+script-not-executable [usr/lib/immich/server/node_modules/*]

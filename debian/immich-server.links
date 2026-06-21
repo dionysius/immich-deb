@@ -1,4 +1,4 @@
 # satisfy weird "builddir" concept of immich
 usr/share/immich/geo usr/lib/immich/.build/geodata
-usr/share/immich/plugins usr/lib/immich/.build/corePlugin
+usr/share/immich/plugin-core usr/lib/immich/.build/plugins/immich-plugin-core
 usr/share/immich/web usr/lib/immich/.build/www
