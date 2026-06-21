@@ -7,11 +7,11 @@
 # See also: https://docs.immich.app/administration/postgres-standalone/
 
 Explanation: immich compatibility
-Package: postgresql-pgvector postgresql-18-pgvector postgresql-17-pgvector postgresql-16-pgvector
+Package: postgresql-pgvector postgresql-19-pgvector postgresql-18-pgvector postgresql-17-pgvector postgresql-16-pgvector
 Pin: version 0.8.*
 Pin-Priority: 995
 
 Explanation: immich compatibility
-Package: postgresql-vchord postgresql-18-vchord postgresql-17-vchord postgresql-16-vchord
+Package: postgresql-vchord postgresql-19-vchord postgresql-18-vchord postgresql-17-vchord postgresql-16-vchord
 Pin: version 1.0.*
 Pin-Priority: 995
