@@ -1,3 +1,9 @@
+immich (3.0.0~rc.2-1) unreleased; urgency=medium
+
+  * prepare for 3.0
+
+ -- dionysius <dragon.dionysius@gmail.com>  Sun, 21 Jun 2026 17:25:18 +0200
+
 immich (2.7.5-7) unstable; urgency=medium
 
   * Add systed file templating, every distro build has now better fitting systemd directives

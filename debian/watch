@@ -1,4 +1,6 @@
 version=4
-opts="filenamemangle=s|.*/v(\d[\d.]+)\.tar\.gz|immich_$1.orig.tar.gz|" \
+opts="filenamemangle=s|.*/v(\d\S+)\.tar\.gz|immich_$1.orig.tar.gz|;s|-rc\.|~rc.|,\
+uversionmangle=s/-rc\./~rc./,\
+dversionmangle=s/-rc\./~rc./" \
   https://github.com/immich-app/immich/tags \
-  .*/archive/refs/tags/v(\d[\d.]+)\.tar\.gz
+  .*/archive/refs/tags/v(\d\S+)\.tar\.gz
