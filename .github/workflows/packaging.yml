@@ -28,16 +28,114 @@ jobs:
         . /etc/os-release
         if { [ "$ID" = "debian" ] && dpkg --compare-versions "$VERSION_ID" le "13"; } || \
            { [ "$ID" = "ubuntu" ] && dpkg --compare-versions "$VERSION_ID" le "24.04"; }; then
-          curl -fsSL https://build.opensuse.org/projects/home:dionysius:immich/signing_keys/download?kind=gpg | gpg --dearmor -o /etc/apt/keyrings/obs-dionysius.key
+          curl -fsSL "https://build.opensuse.org/projects/home:dionysius:immich/signing_keys/download?kind=gpg" | tee /etc/apt/keyrings/obs-dionysius.asc
           dist="${ID^}_${VERSION_ID}"
           [[ "$dist" == Ubuntu* ]] && dist="x${dist}"
-          echo "deb [signed-by=/etc/apt/keyrings/obs-dionysius.key] https://download.opensuse.org/repositories/home:/dionysius:/immich/$dist/ /" | tee /etc/apt/sources.list.d/obs-dionysius.list
+          echo "deb [signed-by=/etc/apt/keyrings/obs-dionysius.asc] https://download.opensuse.org/repositories/home:/dionysius:/immich/$dist/ /" | tee /etc/apt/sources.list.d/obs-dionysius.list
           apt-get update
         fi
 
+  test-matrix:
+    # Expand the build matrix (distro×arch) with a container/vm axis and resolve each distro's incus
+    # image. VMs are amd64-only — GitHub's arm64 runners lack /dev/kvm. Image selection:
+    #   * Debian -> current stable via deb.debian.org's dists/stable pointer (the image server has no
+    #     stable/testing flag, so the highest debian/<N> would wrongly pick testing).
+    #   * Ubuntu -> the two newest LTS (even YY, .04): newest -> ubuntu:latest, second -> ubuntu:oldlts.
+    needs: [build]
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.gen.outputs.matrix }}
+    steps:
+      - name: Set up incus
+        uses: dionysius/incus-zabbly-actions/setup@v1
+      - name: Prepare test matrix
+        id: gen
+        env:
+          BUILD_MATRIX: ${{ needs.build.outputs.matrix }}
+        run: |
+          set -euo pipefail
+          # Debian stable, from Debian's authoritative release pointer
+          deb_release=$(curl -fsSL https://deb.debian.org/debian/dists/stable/Release)
+          deb_cn=$(awk '/^Codename:/{print $2}' <<<"$deb_release")
+          [ -n "$deb_cn" ] || { echo "could not resolve debian stable codename" >&2; exit 1; }
+
+          # Ubuntu: the two newest LTS (even YY, .04), newest first, straight from the image server,
+          # each resolved to its codename so the alias reads ubuntu/<codename> like debian/<codename>.
+          aliases=$(incus image alias list images: -f csv -c a | sort -u)
+          mapfile -t lts < <(grep -E '^ubuntu/[0-9][0-9]\.[0-9][0-9]$' <<<"$aliases" \
+            | cut -d/ -f2 | awk -F. '($1%2==0)&&($2=="04")' | sort -Vru | head -2)
+          [ "${#lts[@]}" -ge 2 ] || { echo "need >=2 ubuntu LTS, got: ${lts[*]:-none}" >&2; exit 1; }
+          declare -A ucn
+          for v in "${lts[@]}"; do ucn[$v]=$(incus image info "images:ubuntu/$v" | awk '/^ *release:/{print $2; exit}'); done
+
+          out='[]'
+          while IFS= read -r e; do
+            distro=$(jq -r '.distro' <<<"$e")
+            case "$distro" in
+              debian-*)      cn=$deb_cn;             ref="images:debian/$cn" ;;
+              ubuntu-latest) cn=${ucn[${lts[0]}]};   ref="images:ubuntu/$cn" ;;
+              ubuntu-oldlts) cn=${ucn[${lts[1]}]};   ref="images:ubuntu/$cn" ;;
+              *) echo "test-matrix: unmapped distro '$distro'" >&2; exit 1 ;;
+            esac
+            base=$(jq -c --arg ref "$ref" --arg cn "$cn" '. + {incus_image:$ref, codename:$cn}' <<<"$e")
+            out=$(jq -c --argjson b "$base" '. + [$b + {kind:"container"}]' <<<"$out")
+            [ "$(jq -r '.arch' <<<"$e")" = amd64 ] && \
+              out=$(jq -c --argjson b "$base" '. + [$b + {kind:"vm"}]' <<<"$out")
+          done < <(jq -c '.include[]' <<<"$BUILD_MATRIX")
+          echo "matrix={\"include\":$out}" >> "$GITHUB_OUTPUT"
+
+  test:
+    # Runs on the test-matrix cells: install the freshly-built .deb artifacts into the launched incus
+    # instance and boot immich. VM cells exercise the units' systemd sandbox directives against a real
+    # kernel that containers mask; services must boot in every cell. Gates the release. See .github/test/.
+    name: ${{ matrix.codename }} (${{ matrix.arch }}, ${{ matrix.kind }})
+    needs: [build, test-matrix]
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.test-matrix.outputs.matrix) }}
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - name: Check out
+        uses: actions/checkout@v6
+
+      - name: Download built packages
+        # Pull every artifact for this distro, for all arches. *_all.deb should only exist once.
+        uses: actions/download-artifact@v4
+        with:
+          pattern: results_${{ matrix.distro }}_*
+          merge-multiple: true
+          path: artifacts
+
+      - name: Set up incus
+        uses: dionysius/incus-zabbly-actions/setup@v1
+
+      - name: Launch instance
+        uses: dionysius/incus-zabbly-actions/launch@v1
+        with:
+          name: immich-test
+          image: ${{ matrix.incus_image }}
+          vm: ${{ matrix.kind == 'vm' }}
+          # Incus VMs default to 1 vCPU / 1GiB — too little for immich's ML startup.
+          config: |
+            ${{ matrix.kind == 'vm' && 'limits.cpu=4' || '' }}
+            ${{ matrix.kind == 'vm' && 'limits.memory=8GiB' || '' }}
+
+      - name: Prepare the system
+        uses: dionysius/incus-zabbly-actions/exec@v1
+        with:
+          instance: immich-test
+          run: .github/test/prepare.sh artifacts "$PWD/artifacts"
+
+      - name: Boot-check
+        uses: dionysius/incus-zabbly-actions/exec@v1
+        with:
+          instance: immich-test
+          run: .github/test/boot-check.sh --out "$GITHUB_STEP_SUMMARY"
+
   release:
     if: startsWith(github.event.ref, 'refs/tags/debian')
-    needs: [build]
+    needs: [build, test]
     uses: dionysius/gbp-gha/.github/workflows/release.yml@main
     with:
       prerelease: true
