@@ -1,3 +1,9 @@
+immich (2.7.5-8) unstable; urgency=medium
+
+  * add libheif-plugin-libde265 as dependency
+
+ -- dionysius <dragon.dionysius@gmail.com>  Mon, 22 Jun 2026 13:13:03 +0200
+
 immich (2.7.5-7) unstable; urgency=medium
 
   * Add systed file templating, every distro build has now better fitting systemd directives
