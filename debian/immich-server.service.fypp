@@ -145,6 +145,8 @@ SetLoginEnvironment=false
 SystemCallFilter=@system-service
 SystemCallArchitectures=native
 RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+# Set @network or filesystem name(s) (e.g. nfs, cifs) to additively allow access to those filesystems
+# Use `systemd-analyze filesystems` to retrieve a list of filesystems defined on the local system
 RestrictFileSystems=@basic-api @common-block
 RestrictRealtime=true
 
