@@ -35,9 +35,76 @@ jobs:
           apt-get update
         fi
 
+  test:
+    # Install the freshly-built .deb artifacts on each target distro and boot immich for real.
+    # Two stages: services must boot on EVERY arch; the media-processing corpus probe runs on
+    # amd64 only. Gates the release. See contrib/test/.
+    needs: [build]
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.build.outputs.matrix) }}
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - name: Check out (full history + tags for corpus-pin resolution)
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Download built packages
+        # Pull every artifact for this distro, for all arches. *_all.deb should only exist once.
+        uses: actions/download-artifact@v4
+        with:
+          pattern: results_${{ matrix.distro }}_*
+          merge-multiple: true
+          path: artifacts
+
+      - name: Fetch test-assets corpus (amd64 only, pinned to the packaged version)
+        if: matrix.arch == 'amd64'
+        run: contrib/test/fetch-corpus.sh "$PWD/test-assets"
+
+      - name: Boot a systemd container and run the package tests
+        # A GitHub job-level `container:` runs steps via `docker exec` with a non-systemd PID 1, so
+        # `systemctl`/`journalctl` can't work there. We therefore start the distro container
+        # ourselves with systemd as PID 1 (privileged + cgroup), bind-mount the checkout, and run
+        # the in-place scripts inside it via `docker exec` — so boot-check exercises the real units.
+        env:
+          IMAGE: ${{ matrix.image }}
+          ARCH: ${{ matrix.arch }}
+        run: |
+          set -euo pipefail
+          docker run -d --name immich-test --privileged --cgroupns=host \
+            --tmpfs /run --tmpfs /run/lock -v /sys/fs/cgroup:/sys/fs/cgroup:rw \
+            -v "$PWD:/work" -w /work -e DEBIAN_FRONTEND=noninteractive \
+            "$IMAGE" bash -c "apt-get update -qq && apt-get install -y -qq systemd systemd-sysv && exec /sbin/init"
+          # wait for systemd to finish booting inside the container
+          for _ in $(seq 60); do
+            state=$(docker exec immich-test systemctl is-system-running 2>/dev/null || true)
+            case "$state" in running|degraded) break;; esac
+            sleep 2
+          done
+          docker exec immich-test bash /work/contrib/test/provision.sh artifacts /work/artifacts
+          if [ "$ARCH" = amd64 ]; then
+            docker exec immich-test bash /work/contrib/test/run.sh --phases boot,probe --corpus /work/test-assets --out /work/test-out
+          else
+            docker exec immich-test bash /work/contrib/test/run.sh --phases boot --out /work/test-out
+          fi
+
+      - name: Job summary
+        if: always()
+        run: |
+          [ -f test-out/summary.txt ] && {
+            echo "### ${{ matrix.distro }} (${{ matrix.arch }})"
+            sed 's/^/- /' test-out/summary.txt
+          } >> "$GITHUB_STEP_SUMMARY" || true
+
+      - name: Stop container
+        if: always()
+        run: docker rm -f immich-test || true
+
   release:
     if: startsWith(github.event.ref, 'refs/tags/debian')
-    needs: [build]
+    needs: [build, test]
     uses: dionysius/gbp-gha/.github/workflows/release.yml@main
     with:
       prerelease: true
