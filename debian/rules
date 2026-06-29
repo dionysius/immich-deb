@@ -22,14 +22,16 @@ export DEB_SOURCE DEB_VERSION DEB_VERSION_UPSTREAM
 # make build-specific binaries available in PATH
 export PATH := $(CURDIR)/$(TMPBUILD)/bin:$(PATH)
 
-# extism-js version to use (>= 1.4.0, needs glibc >= 2.39)
+# extism-js version to use (needs glibc >= 2.39)
 # debian trixie glibc=2.41
 # ubuntu noble glibc=2.39
-EXTISM_JS_VERSION = 1.5.1
-EXTISM_JS_SHA256_x86_64 = f6a4a3a8f16651a527a4643f95d229c854a04d66d4628cdc724a58c699b93c95
-EXTISM_JS_SHA256_aarch64 = 28cdffcb7d4e74b98401c738f1348b9977a2d860fa1613876250fb5bf12b3fe2
+# immich's mise.toml requests "github:extism/js-pdk" = "1.6.0"
+EXTISM_JS_VERSION = 1.6.0
+EXTISM_JS_SHA256_x86_64 = 4ded271ccf465031ccd0dc35e7a140e134d7f30721671cc4a8e1ff805d4aad68
+EXTISM_JS_SHA256_aarch64 = 15a186250e68d6bff4ec839fff275d45a90e383a69209dcc1239eb9e3aee6e1b
 # binaryen version to use (need wasm-merge, which seems to exist >= 120)
 # current ubuntu LTS package is outdated, debian stable is ok
+# immich's mise.toml requests "github:webassembly/binaryen" = "version_124"
 BINARYEN_VERSION = 125
 BINARYEN_SHA256_x86_64 = 7c3bc16599c8274a04d34a504fe4be2047884f900e0e2da2f6fb9cd667183be4
 BINARYEN_SHA256_aarch64 = d0382de3c189a7cbb9fdda93e2966f4557f6a00f201e2c4937c27ca01cead4fc
@@ -59,13 +61,13 @@ endif
 # - https://github.com/immich-app/immich/blob/main/server/Dockerfile
 # - https://github.com/immich-app/immich/blob/main/machine-learning/Dockerfile
 
+# immich ships a root Makefile with targets affecting debuild
 %:
-	dh $@
+	dh $@ --buildsystem=none
 
 override_dh_auto_clean:
-	dh_auto_clean
 	rm -rf $(PNPMSTORE)
-	rm -rf server/dist web/build cli/dist plugins/dist
+	rm -rf server/dist web/build packages/cli/dist packages/plugin-core/dist packages/sdk/dist packages/plugin-sdk/dist
 	rm -f $(CURDIR)/.npmrc
 
 override_dh_auto_configure:
@@ -117,18 +119,18 @@ override_dh_auto_configure:
 
 override_dh_auto_build:
 # we may need to add --cpu and --os to pnpm install and deploy commands for package cross-building
-	SHARP_IGNORE_GLOBAL_LIBVIPS=true pnpm --filter immich --frozen-lockfile build
-	SHARP_FORCE_GLOBAL_LIBVIPS=true pnpm --filter immich --frozen-lockfile --prod --no-optional deploy $(TMPDEB)/usr/lib/immich/server
+	SHARP_IGNORE_GLOBAL_LIBVIPS=true pnpm --filter @immich/sdk --filter @immich/plugin-sdk --filter immich build
+	SHARP_FORCE_GLOBAL_LIBVIPS=true pnpm --filter immich --prod --no-optional deploy $(TMPDEB)/usr/lib/immich/server
 
-	pnpm --filter @immich/sdk --filter immich-web --frozen-lockfile install
-	SHARP_IGNORE_GLOBAL_LIBVIPS=true pnpm --filter @immich/sdk --filter immich-web --frozen-lockfile build
+	SHARP_IGNORE_GLOBAL_LIBVIPS=true pnpm --filter @immich/sdk --filter immich-web install --frozen-lockfile
+	pnpm --filter @immich/sdk --filter immich-web build
 
-	pnpm --filter @immich/sdk --filter @immich/cli --frozen-lockfile install
-	pnpm --filter @immich/sdk --filter @immich/cli --frozen-lockfile build
-	pnpm --filter @immich/cli --frozen-lockfile --prod --no-optional deploy $(TMPDEB)/usr/lib/immich/cli
+	pnpm --filter @immich/sdk --filter @immich/cli install --frozen-lockfile
+	pnpm --filter @immich/sdk --filter @immich/cli build
+	pnpm --filter @immich/cli --prod --no-optional deploy $(TMPDEB)/usr/lib/immich/cli
 
-	pnpm --filter plugins --frozen-lockfile install
-	pnpm --filter plugins --frozen-lockfile build
+	pnpm --filter @immich/sdk --filter @immich/plugin-sdk --filter @immich/plugin-core install --frozen-lockfile
+	pnpm --filter @immich/sdk --filter @immich/plugin-sdk --filter @immich/plugin-core build
 
 # TODO: predownload and prebuild python packages with uv
 
@@ -140,7 +142,7 @@ override_dh_auto_build:
 
 # generate third party licenses info
 # TODO: could also be added to Built:Using or something similar, pnpm has a json output mode that could be parsed
-	pnpm --filter immich --filter plugins licenses list --prod --long | gzip > $(TMPDEB)/usr/share/doc/immich-server/THIRD-PARTY-LICENSES.txt.gz
+	pnpm --filter immich --filter @immich/plugin-core licenses list --prod --long | gzip > $(TMPDEB)/usr/share/doc/immich-server/THIRD-PARTY-LICENSES.txt.gz
 	pnpm --filter @immich/sdk --filter immich-web licenses list --prod --long | gzip > $(TMPDEB)/usr/share/doc/immich-cli/THIRD-PARTY-LICENSES.txt.gz
 	pnpm --filter @immich/sdk --filter @immich/cli licenses list --prod --long | gzip > $(TMPDEB)/usr/share/doc/immich-web-data/THIRD-PARTY-LICENSES.txt.gz
 
@@ -169,10 +171,10 @@ override_dh_installsystemd:
 	dh_installsystemd -pimmich-machine-learning
 
 override_dh_strip:
-	dh_strip -a -X /prebuilds/ -X $(PNPMSTORE)
+	dh_strip -a -X /prebuilds/
 
 override_dh_shlibdeps:
-	dh_shlibdeps -a -X /prebuilds/ -X $(PNPMSTORE) -- --ignore-missing-info
+	dh_shlibdeps -a -X /prebuilds/ -- --ignore-missing-info
 
 override_dh_installman:
 	mkdir -p $(TMPDEB)/man/immich-cli $(TMPDEB)/man/immich-server
