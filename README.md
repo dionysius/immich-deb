@@ -43,7 +43,7 @@ As this package provides an alternative installation method, there may be differ
 
 These packages favour the distribution-native way of running software. Wherever possible the packages link against system libraries, so they receive the distribution's regular security updates and stability, with newer distributions or backports providing more recent libraries.
 
-By default the systemd services are extensively sandboxed, isolating the service from the rest of the system, while the configuration and data directories are restricted to the service's own user. Complex setups may need extra configuration, freely adjustable in the service file, whose comments and/or the [Wiki](/wiki) should cover the common cases.
+By default the systemd services are extensively sandboxed, isolating the service from the rest of the system, while the configuration and data directories are restricted to the service's own user. Complex setups may need extra configuration, freely adjustable in the service file, whose comments and/or the [Wiki](https://github.com/dionysius/immich-deb/wiki) should cover the common cases.
 
 ## Release schedule
 
