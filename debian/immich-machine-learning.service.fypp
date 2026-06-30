@@ -76,7 +76,7 @@ SecureBits=noroot noroot-locked
 ProtectSystem=strict
 ProtectHome=true
 ProtectProc=noaccess
-ProcSubset=pid
+# ProcSubset=pid # not possible: machine-learning reads /proc/cpuinfo for CPU feature detection
 
 # Namespace isolation
 #:if SYSTEMD_MAJOR >= 257
