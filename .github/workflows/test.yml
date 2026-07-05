@@ -105,3 +105,12 @@ jobs:
         with:
           instance: immich-test
           run: bash .github/test/boot-check.sh --out "$GITHUB_STEP_SUMMARY"
+
+      - name: vchord upgrade trigger
+        # Baseline vchord comes from the production apt repo (1.0.0); upgrade to a newer upstream
+        # .deb (1.1.1) manually and assert immich-db-reqs' dpkg trigger auto-restarts postgres +
+        # immich-server so the extension update succeeds. See .github/test/vchord-upgrade-check.sh.
+        uses: dionysius/incus-zabbly-actions/exec@v1
+        with:
+          instance: immich-test
+          run: bash .github/test/vchord-upgrade-check.sh --out "$GITHUB_STEP_SUMMARY"

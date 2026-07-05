@@ -1,0 +1,8 @@
+# Restart PostgreSQL when the vchord extension shared library is upgraded.
+# vchord is loaded via shared_preload_libraries, so the old .so stays mapped in
+# the running server until it restarts. The vchord package ships no maintainer
+# scripts, so react to its .so being written here (see immich-db-reqs.postinst).
+interest-noawait /usr/lib/postgresql/16/lib/vchord.so
+interest-noawait /usr/lib/postgresql/17/lib/vchord.so
+interest-noawait /usr/lib/postgresql/18/lib/vchord.so
+interest-noawait /usr/lib/postgresql/19/lib/vchord.so

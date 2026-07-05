@@ -1,6 +1,37 @@
 #!/bin/sh
 set -e
 
+# Restart PostgreSQL after the vchord extension shared library was upgraded.
+# vchord is in shared_preload_libraries, so the old .so stays mapped until the
+# server restarts; immich's `ALTER EXTENSION vchord UPDATE` then fails against
+# the still-loaded old library. Driven by a dpkg file trigger on vchord.so
+# (see immich-db-reqs.triggers), since the vchord package has no postinst.
+if [ "$1" = "triggered" ]; then
+  [ -d /run/systemd/system ] || exit 0
+
+  bumped=""
+  # $2 is the space-separated list of trigger paths that fired
+  for trig in $2; do
+    rest=${trig#/usr/lib/postgresql/}
+    pgver=${rest%%/lib/*}
+    case "$pgver" in ''|*[!0-9]*) continue ;; esac
+
+    # only versions where we enabled vchord, and only restart a running instance
+    [ -f "/etc/postgresql/$pgver/main/conf.d/10-immich-db-reqs.conf" ] || continue
+    if systemctl -q is-active "postgresql@$pgver-main.service" 2>/dev/null; then
+      deb-systemd-invoke restart "postgresql@$pgver-main.service" || true
+      bumped=1
+    fi
+  done
+
+  # let immich retry its pending migration against the freshly loaded library
+  if [ -n "$bumped" ] && systemctl -q is-active immich-server.service 2>/dev/null; then
+    deb-systemd-invoke restart immich-server.service || true
+  fi
+
+  exit 0
+fi
+
 # add vchord extension to configuration automatically on package install
 if [ "$1" = "configure" ] || [ "$1" = "abort-upgrade" ] || [ "$1" = "abort-deconfigure" ] || [ "$1" = "abort-remove" ] ; then
   for conf in /etc/postgresql/*/main/conf.d; do
