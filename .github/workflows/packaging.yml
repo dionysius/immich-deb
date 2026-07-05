@@ -28,24 +28,23 @@ jobs:
         . /etc/os-release
         if { [ "$ID" = "debian" ] && dpkg --compare-versions "$VERSION_ID" le "13"; } || \
            { [ "$ID" = "ubuntu" ] && dpkg --compare-versions "$VERSION_ID" le "24.04"; }; then
-          curl -fsSL https://build.opensuse.org/projects/home:dionysius:immich/signing_keys/download?kind=gpg | gpg --dearmor -o /etc/apt/keyrings/obs-dionysius.key
+          curl -fsSL "https://build.opensuse.org/projects/home:dionysius:immich/signing_keys/download?kind=gpg" | tee /etc/apt/keyrings/obs-dionysius.asc
           dist="${ID^}_${VERSION_ID}"
           [[ "$dist" == Ubuntu* ]] && dist="x${dist}"
-          echo "deb [signed-by=/etc/apt/keyrings/obs-dionysius.key] https://download.opensuse.org/repositories/home:/dionysius:/immich/$dist/ /" | tee /etc/apt/sources.list.d/obs-dionysius.list
+          echo "deb [signed-by=/etc/apt/keyrings/obs-dionysius.asc] https://download.opensuse.org/repositories/home:/dionysius:/immich/$dist/ /" | tee /etc/apt/sources.list.d/obs-dionysius.list
           apt-get update
         fi
 
-  release:
-    if: startsWith(github.event.ref, 'refs/tags/debian')
+  test:
+    # Install the built .deb artifacts into a real systemd instance (incus container + amd64 VM per
+    # distro) and boot immich; gates the release. See test.yml and .github/test/.
     needs: [build]
-    uses: dionysius/gbp-gha/.github/workflows/release.yml@main
+    uses: ./.github/workflows/test.yml
     with:
-      prerelease: true
-      publish: true
+      build_matrix: ${{ needs.build.outputs.matrix }}
 
-  promote:
-    uses: dionysius/gbp-gha/.github/workflows/promote-release.yml@main
-    needs: [release]
-    with:
-      in_days: 7
-      release_pattern: '{debian/*.*}.*'
+  publish:
+    # Create the GitHub release from the built artifacts, then promote it after a delay. See publish.yml.
+    if: startsWith(github.event.ref, 'refs/tags/debian')
+    needs: [build, test]
+    uses: ./.github/workflows/publish.yml
