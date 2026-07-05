@@ -1,3 +1,10 @@
+immich (3.0.1-1) unstable; urgency=medium
+
+  * validate service start (in cts and in vms)
+  * update for 3.0
+
+ -- dionysius <dragon.dionysius@gmail.com>  Sun, 05 Jul 2026 18:05:47 +0200
+
 immich (2.7.5-9) unstable; urgency=medium
 
   * Add comment to RestrictFileSystems on how to allow network filesystems
