@@ -16,11 +16,15 @@ if [ "$1" = "triggered" ]; then
     pgver=${rest%%/lib/*}
     case "$pgver" in ''|*[!0-9]*) continue ;; esac
 
-    # only versions where we enabled vchord, and only restart a running instance
-    [ -f "/etc/postgresql/$pgver/main/conf.d/10-immich-db-reqs.conf" ] || continue
-    if systemctl -q is-active "postgresql@$pgver-main.service" 2>/dev/null; then
-      deb-systemd-invoke restart "postgresql@$pgver-main.service" || true
-      bumped=1
+    if [ -f "/etc/postgresql/$pgver/main/conf.d/10-immich-db-reqs.conf" ]; then
+      # our conf proves we manage vchord's shared_preload_libraries: restart automatically (if running)
+      if systemctl -q is-active "postgresql@$pgver-main.service" 2>/dev/null; then
+        deb-systemd-invoke restart "postgresql@$pgver-main.service" || true
+        bumped=1
+      fi
+    else
+      # shared_preload_libraries is managed elsewhere; the new vchord library needs a restart to load
+      echo "immich-db-reqs: vchord for postgresql-$pgver was upgraded but shared_preload_libraries is configured outside immich-db-reqs; restart postgresql@$pgver-main and immich-server manually to load the new library." >&2
     fi
   done
 
