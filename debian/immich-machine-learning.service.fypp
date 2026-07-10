@@ -88,7 +88,8 @@ PrivateIPC=true
 #:if SYSTEMD_MAJOR >= 258
 PrivateBPF=true
 #:endif
-# Allow hardware-accelerated ML inference.
+
+# Allow hardware-accelerated ML inference
 PrivateDevices=true
 DevicePolicy=closed
 # Intel/AMD (VAAPI, QuickSync)

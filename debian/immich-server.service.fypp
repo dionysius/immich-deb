@@ -107,7 +107,8 @@ PrivateIPC=true
 #:if SYSTEMD_MAJOR >= 258
 PrivateBPF=true
 #:endif
-# Allow hardware-accelerated transcoding.
+
+# Allow hardware-accelerated transcoding
 PrivateDevices=true
 DevicePolicy=closed
 # Intel/AMD (VAAPI, QuickSync)
