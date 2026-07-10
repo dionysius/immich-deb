@@ -111,17 +111,24 @@ PrivateBPF=true
 PrivateDevices=true
 DevicePolicy=closed
 # Intel/AMD (VAAPI, QuickSync)
-DeviceAllow=/dev/dri rw
+DeviceAllow=char-drm rw
+BindPaths=-/dev/dri
 # NVIDIA (NVENC, CUDA)
-DeviceAllow=/dev/nvidia* rw
+DeviceAllow=char-nvidia-frontend rw
+DeviceAllow=char-nvidia-uvm rw
+DeviceAllow=char-nvidia-caps rw
+BindPaths=-/dev/nvidiactl -/dev/nvidia0 -/dev/nvidia-uvm -/dev/nvidia-uvm-tools -/dev/nvidia-modeset -/dev/nvidia-caps
 # AMD ROCm
 DeviceAllow=/dev/kfd rw
+BindPaths=-/dev/kfd
 # Rockchip SoC
 DeviceAllow=/dev/rga rw
-DeviceAllow=/dev/dma_heap rw
+DeviceAllow=char-dma_heap rw
 DeviceAllow=/dev/mpp_service rw
+BindPaths=-/dev/rga -/dev/dma_heap -/dev/mpp_service
 # ARM Mali
 DeviceAllow=/dev/mali0 rw
+BindPaths=-/dev/mali0
 
 # Kernel and system protection
 ProtectClock=true
