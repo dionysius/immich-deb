@@ -1,3 +1,9 @@
+immich (3.0.2-2) unstable; urgency=medium
+
+  * fix GPU access under systemd sandboxing
+
+ -- dionysius <dragon.dionysius@gmail.com>  Fri, 10 Jul 2026 22:28:04 +0200
+
 immich (3.0.2-1) unstable; urgency=medium
 
   * update to [3.0.2](https://github.com/immich-app/immich/releases/tag/v3.0.2)
