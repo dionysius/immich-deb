@@ -1,3 +1,10 @@
+immich (3.1.0-1) unstable; urgency=medium
+
+  * remove timezone setting (inherit system)
+  * update to [3.1.0](https://github.com/immich-app/immich/releases/tag/v3.1.0)
+
+ -- dionysius <dragon.dionysius@gmail.com>  Wed, 29 Jul 2026 19:16:03 +0200
+
 immich (3.0.3-1) unstable; urgency=medium
 
   * update to [3.0.3](https://github.com/immich-app/immich/releases/tag/v3.0.3)
