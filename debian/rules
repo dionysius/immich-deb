@@ -25,10 +25,10 @@ export PATH := $(CURDIR)/$(TMPBUILD)/bin:$(PATH)
 # extism-js version to use (needs glibc >= 2.39)
 # debian trixie glibc=2.41
 # ubuntu noble glibc=2.39
-# immich's mise.toml requests "github:extism/js-pdk" = "1.6.0"
-EXTISM_JS_VERSION = 1.6.0
-EXTISM_JS_SHA256_x86_64 = 4ded271ccf465031ccd0dc35e7a140e134d7f30721671cc4a8e1ff805d4aad68
-EXTISM_JS_SHA256_aarch64 = 15a186250e68d6bff4ec839fff275d45a90e383a69209dcc1239eb9e3aee6e1b
+# immich's mise.toml requests "github:extism/js-pdk" = "v1.7.0"
+EXTISM_JS_VERSION = 1.7.0
+EXTISM_JS_SHA256_x86_64 = 63b72da2f5e88655522dc21477de549f238a2f40546a69ce4e0fce7e78654035
+EXTISM_JS_SHA256_aarch64 = 025f4050b199d68413c159bde1187271ae270021a9f7171e7beb509922821f2a
 # binaryen version to use (need wasm-merge, which seems to exist >= 120)
 # current ubuntu LTS package is outdated, debian stable is ok
 # immich's mise.toml requests "github:webassembly/binaryen" = "version_124"
@@ -124,7 +124,9 @@ override_dh_auto_configure:
 override_dh_auto_build:
 # we may need to add --cpu and --os to pnpm install and deploy commands for package cross-building
 	SHARP_IGNORE_GLOBAL_LIBVIPS=true pnpm --filter @immich/sdk --filter @immich/plugin-sdk --filter immich build
-	SHARP_FORCE_GLOBAL_LIBVIPS=true pnpm --filter immich --prod --no-optional deploy $(TMPDEB)/usr/lib/immich/server
+	pnpm --filter immich --prod --no-optional deploy $(TMPDEB)/usr/lib/immich/server
+# sharp needs a separate rebuild against the distro libvips: since 0.35.x, forcing it during deploy above no longer takes effect
+	SHARP_FORCE_GLOBAL_LIBVIPS=true pnpm --config.verify-deps-before-run=false --dir $(TMPDEB)/usr/lib/immich/server/node_modules/sharp exec npm run build
 
 	SHARP_IGNORE_GLOBAL_LIBVIPS=true pnpm --filter @immich/sdk --filter immich-web install --frozen-lockfile
 	pnpm --filter @immich/sdk --filter immich-web build
