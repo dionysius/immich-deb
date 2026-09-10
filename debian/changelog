@@ -1,3 +1,11 @@
+immich (3.2.0-1) unstable; urgency=medium
+
+  * update to [3.2.0](https://github.com/immich-app/immich/releases/tag/v3.2.0)
+  * adjust packaging for immich 3.2.0 upstream changes
+  * drop noble due to new dependency requirements (non-latest lts was best effort anyway)
+
+ -- dionysius <dragon.dionysius@gmail.com>  Fri, 11 Sep 2026 00:01:29 +0200
+
 immich (3.1.0-1) unstable; urgency=medium
 
   * remove timezone setting (inherit system)
