@@ -1,4 +1,4 @@
-immich (3.2.0-1) unstable; urgency=medium
+immich (3.2.0-2) unstable; urgency=medium
 
   * update to [3.2.0](https://github.com/immich-app/immich/releases/tag/v3.2.0)
   * adjust packaging for immich 3.2.0 upstream changes
