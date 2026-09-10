@@ -197,16 +197,6 @@ export class AuthService extends BaseService {
   }
 
   async adminSignUp(dto: SignUpDto): Promise<UserAdminResponseDto> {
-    const { setup } = this.configRepository.getEnv();
-    if (!setup.allow) {
-      throw new BadRequestException('Admin setup is disabled');
-    }
-
-    const adminUser = await this.userRepository.getAdmin();
-    if (adminUser) {
-      throw new BadRequestException('The server already has an admin');
-    }
-
     const admin = await this.createUser({
       isAdmin: true,
       email: dto.email,
@@ -388,7 +378,7 @@ export class AuthService extends BaseService {
   private async syncProfilePicture(user: UserAdmin, url: string) {
     try {
       const oldPath = user.profileImagePath;
-      const { data } = await this.oauthRepository.getProfilePicture(url);
+      const data = await this.oauthRepository.getProfilePicture(url);
 
       const config = await this.getConfig({ withCache: true });
       const profileImagePath = await generateProfileImage(
@@ -559,7 +549,7 @@ export class AuthService extends BaseService {
       const now = DateTime.now();
       const updatedAt = DateTime.fromJSDate(session.updatedAt);
       const diff = now.diff(updatedAt, ['hours']);
-      if (diff.hours > 1 || appVersion != session.appVersion) {
+      if (diff.hours > 1 || appVersion !== session.appVersion) {
         await this.sessionRepository.update(session.id, {
           id: session.id,
           updatedAt: new Date(),
