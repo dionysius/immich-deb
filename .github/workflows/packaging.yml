@@ -26,14 +26,11 @@ jobs:
         apt-get install -y curl
         curl -fsSL https://deb.nodesource.com/setup_24.x | bash -
         . /etc/os-release
-        if { [ "$ID" = "debian" ] && dpkg --compare-versions "$VERSION_ID" le "13"; } || \
-           { [ "$ID" = "ubuntu" ] && dpkg --compare-versions "$VERSION_ID" le "24.04"; }; then
-          curl -fsSL "https://build.opensuse.org/projects/home:dionysius:immich/signing_keys/download?kind=gpg" | tee /etc/apt/keyrings/obs-dionysius.asc
-          dist="${ID^}_${VERSION_ID}"
-          [[ "$dist" == Ubuntu* ]] && dist="x${dist}"
-          echo "deb [signed-by=/etc/apt/keyrings/obs-dionysius.asc] https://download.opensuse.org/repositories/home:/dionysius:/immich/$dist/ /" | tee /etc/apt/sources.list.d/obs-dionysius.list
-          apt-get update
-        fi
+        curl -fsSL "https://build.opensuse.org/projects/home:dionysius:immich/signing_keys/download?kind=gpg" | tee /etc/apt/keyrings/obs-dionysius.asc
+        dist="${ID^}_${VERSION_ID}"
+        [[ "$dist" == Ubuntu* ]] && dist="x${dist}"
+        echo "deb [signed-by=/etc/apt/keyrings/obs-dionysius.asc] https://download.opensuse.org/repositories/home:/dionysius:/immich/$dist/ /" | tee /etc/apt/sources.list.d/obs-dionysius.list
+        apt-get update
 
   test:
     # Install the built .deb artifacts into a real systemd instance (incus container + amd64 VM per
