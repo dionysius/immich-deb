@@ -16,7 +16,7 @@ jobs:
     # image. VMs are amd64-only — GitHub's arm64 runners lack /dev/kvm. Image selection:
     #   * Debian -> current stable via deb.debian.org's dists/stable pointer (the image server has no
     #     stable/testing flag, so the highest debian/<N> would wrongly pick testing).
-    #   * Ubuntu -> the two newest LTS (even YY, .04): newest -> ubuntu:latest, second -> ubuntu:oldlts.
+    #   * Ubuntu -> the newest LTS (even YY, .04) -> ubuntu:latest.
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.gen.outputs.matrix }}
@@ -34,22 +34,20 @@ jobs:
           deb_cn=$(awk '/^Codename:/{print $2}' <<<"$deb_release")
           [ -n "$deb_cn" ] || { echo "could not resolve debian stable codename" >&2; exit 1; }
 
-          # Ubuntu: the two newest LTS (even YY, .04), newest first, straight from the image server,
-          # each resolved to its codename so the alias reads ubuntu/<codename> like debian/<codename>.
+          # Ubuntu: the newest LTS (even YY, .04), straight from the image server, resolved to its
+          # codename so the alias reads ubuntu/<codename> like debian/<codename>.
           aliases=$(incus image alias list images: -f csv -c a | sort -u)
-          mapfile -t lts < <(grep -E '^ubuntu/[0-9][0-9]\.[0-9][0-9]$' <<<"$aliases" \
-            | cut -d/ -f2 | awk -F. '($1%2==0)&&($2=="04")' | sort -Vru | head -2)
-          [ "${#lts[@]}" -ge 2 ] || { echo "need >=2 ubuntu LTS, got: ${lts[*]:-none}" >&2; exit 1; }
-          declare -A ucn
-          for v in "${lts[@]}"; do ucn[$v]=$(incus image info "images:ubuntu/$v" | awk '/^ *release:/{print $2; exit}'); done
+          lts=$(grep -E '^ubuntu/[0-9][0-9]\.[0-9][0-9]$' <<<"$aliases" \
+            | cut -d/ -f2 | awk -F. '($1%2==0)&&($2=="04")' | sort -Vru | head -1)
+          [ -n "$lts" ] || { echo "could not resolve ubuntu latest lts" >&2; exit 1; }
+          ubu_cn=$(incus image info "images:ubuntu/$lts" | awk '/^ *release:/{print $2; exit}')
 
           out='[]'
           while IFS= read -r e; do
             distro=$(jq -r '.distro' <<<"$e")
             case "$distro" in
-              debian-*)      cn=$deb_cn;             ref="images:debian/$cn" ;;
-              ubuntu-latest) cn=${ucn[${lts[0]}]};   ref="images:ubuntu/$cn" ;;
-              ubuntu-oldlts) cn=${ucn[${lts[1]}]};   ref="images:ubuntu/$cn" ;;
+              debian-*)      cn=$deb_cn;   ref="images:debian/$cn" ;;
+              ubuntu-latest) cn=$ubu_cn;   ref="images:ubuntu/$cn" ;;
               *) echo "test-matrix: unmapped distro '$distro'" >&2; exit 1 ;;
             esac
             base=$(jq -c --arg ref "$ref" --arg cn "$cn" '. + {incus_image:$ref, codename:$cn}' <<<"$e")
@@ -96,9 +94,7 @@ jobs:
         uses: dionysius/incus-zabbly-actions/exec@v1
         with:
           instance: immich-test
-          # TODO: remove once noble is outphased. `bash <script>` dodges noble's virtiofs execve bug
-          # ("bad interpreter: Bad address") by reading the file instead of exec'ing it.
-          run: bash .github/test/prepare.sh artifacts "$PWD/artifacts"
+          run: .github/test/prepare.sh artifacts "$PWD/artifacts"
 
       - name: Boot-check
         uses: dionysius/incus-zabbly-actions/exec@v1
