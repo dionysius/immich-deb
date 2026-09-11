@@ -1,3 +1,11 @@
+immich (3.2.0-3) unstable; urgency=medium
+
+  * drop obsolete machine-learning cache/gunicorn env vars, add rocm precision
+  * fix server env vars against upstream schema
+  * load service env files via EnvironmentFile instead of shell sourcing
+
+ -- dionysius <dragon.dionysius@gmail.com>  Fri, 11 Sep 2026 20:12:10 +0200
+
 immich (3.2.0-2) unstable; urgency=medium
 
   * update to [3.2.0](https://github.com/immich-app/immich/releases/tag/v3.2.0)
