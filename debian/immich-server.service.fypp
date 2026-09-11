@@ -26,12 +26,11 @@ After=network.target
 EnvironmentFile=-%E/default/immich-server
 # build info
 EnvironmentFile=/usr/share/doc/immich-server/build.env
+# immich configuration file.
+EnvironmentFile=/etc/immich/server.env
 # Service execution.
 Type=exec
 ExecStart=/bin/sh -c ' \
-  set -a; \
-  . /etc/immich/server.env; \
-  set +a; \
   if [ -z "$UV_THREADPOOL_SIZE" ]; then \
     CPU_CORES=$(/usr/lib/immich/server/bin/get-cpus.sh); \
     if [ "$CPU_CORES" -gt 4 ]; then \

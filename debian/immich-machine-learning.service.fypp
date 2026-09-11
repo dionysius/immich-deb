@@ -18,13 +18,11 @@ After=network.target
 EnvironmentFile=-%E/default/immich-machine-learning
 # build info
 EnvironmentFile=/usr/share/doc/immich-machine-learning/build.env
+# immich configuration file.
+EnvironmentFile=/etc/immich/machine-learning.env
 # Service execution.
 Type=exec
-ExecStart=/bin/sh -c ' \
-  set -a; \
-  . /etc/immich/machine-learning.env; \
-  set +a; \
-  exec /usr/lib/immich/machine-learning/bin/uv run --extra $DEVICE -m immich_ml'
+ExecStart=/bin/sh -c 'exec /usr/lib/immich/machine-learning/bin/uv run --extra $DEVICE -m immich_ml'
 WorkingDirectory=/usr/lib/immich/machine-learning
 # Restart on failure
 Restart=on-failure
