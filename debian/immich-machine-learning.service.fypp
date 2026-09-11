@@ -31,13 +31,8 @@ RestartSec=5s
 ## Permissions and directories
 User=immich
 Group=immich
-#:if SYSTEMD_MAJOR >= 257
 # Read-only configuration directory (read-only mount, permissions managed by tmpfiles, warns if mode differs).
 ConfigurationDirectory=immich::ro
-#:else
-# Configuration directory (permissions managed by tmpfiles, warns if mode differs).
-ConfigurationDirectory=immich
-#:endif
 ConfigurationDirectoryMode=0500
 # Writable directories (read-write for the service, read-only for the group, reapplies permissions recursively if different).
 CacheDirectory=immich
@@ -77,11 +72,7 @@ ProtectProc=noaccess
 # ProcSubset=pid # not possible: machine-learning reads /proc/cpuinfo for CPU feature detection
 
 # Namespace isolation
-#:if SYSTEMD_MAJOR >= 257
 PrivateTmp=disconnected
-#:else
-PrivateTmp=true
-#:endif
 PrivateIPC=true
 #:if SYSTEMD_MAJOR >= 258
 PrivateBPF=true
@@ -115,18 +106,12 @@ ProtectClock=true
 ProtectKernelTunables=true
 ProtectKernelModules=true
 ProtectKernelLogs=true
-#:if SYSTEMD_MAJOR >= 257
 ProtectControlGroups=strict
-#:else
-ProtectControlGroups=true
-#:endif
 
 # Execution restrictions
 # Allow for Python JIT and NumPy optimizations.
 MemoryDenyWriteExecute=false
-#:if SYSTEMD_MAJOR >= 255
 SetLoginEnvironment=false
-#:endif
 
 # System call and network filtering
 SystemCallFilter=@system-service
