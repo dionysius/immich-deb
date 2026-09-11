@@ -37,9 +37,5 @@ UV_PYTHON_PREFERENCE=only-managed
 #LD_PRELOAD=libmimalloc.so.3
 # cache for everything respecting the XDG specification
 XDG_CACHE_HOME=/var/cache/immich/.cache
-# cache for matplotlib
-MPLCONFIGDIR=/var/cache/immich/.cache/matplotlib
 # cache for rustup (watchfiles uses puccinialin/rustup)
 RUSTUP_HOME=/var/cache/immich/.cache/rustup
-# disable gunicorn control socket
-GUNICORN_CMD_ARGS="--no-control-socket"
