@@ -21,6 +21,7 @@ After=network.target
 
 # Refer to the manpages `systemd.service` and `systemd.exec` for detailed documentation on each option.
 [Service]
+SyslogIdentifier=immich-server
 ## Service execution environment
 # Service configuration file.
 EnvironmentFile=-%E/default/immich-server
