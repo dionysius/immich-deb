@@ -1,3 +1,10 @@
+immich (3.2.0-4) unstable; urgency=medium
+
+  * drop dead SYSTEMD_MAJOR<257 branches now that noble is gone
+  * add SyslogIdentifier to immich-server and immich-machine-learning units
+
+ -- dionysius <dragon.dionysius@gmail.com>  Sun, 13 Sep 2026 12:09:45 +0200
+
 immich (3.2.0-3) unstable; urgency=medium
 
   * drop obsolete machine-learning cache/gunicorn env vars, add rocm precision
