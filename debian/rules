@@ -57,9 +57,9 @@ SYSTEMD_MAJOR := $(shell dpkg-query -W -f='$${Version}' libsystemd0 2>/dev/null 
 endif
 
 # steps mostly imitate official docker images, so changes there may need to be reflected here
-# - https://github.com/immich-app/base-images/blob/main/server/Dockerfile
-# - https://github.com/immich-app/immich/blob/main/server/Dockerfile
-# - https://github.com/immich-app/immich/blob/main/machine-learning/Dockerfile
+# - base-images/server/Dockerfile (component pinned in debian/watch)
+# - server/Dockerfile
+# - machine-learning/Dockerfile
 
 # sharp is built against the distro libvips (SHARP_FORCE_GLOBAL_LIBVIPS below), so the
 # libvips floor in debian/control must be >= sharp's required minimum. Recheck on version bumps:

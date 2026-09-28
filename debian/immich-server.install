@@ -1,3 +1,4 @@
+base-images/server/policy.xml usr/share/immich/ImageMagick
 build.env usr/share/doc/immich-server
 debian/install/system/server.default usr/share/immich/system
 debian/install/system/server.env usr/share/immich/system
