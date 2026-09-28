@@ -1,3 +1,11 @@
+immich (3.2.4-1) unstable; urgency=medium
+
+  * update to [3.2.4](https://github.com/immich-app/immich/releases/tag/v3.2.4)
+  * ship hardened ImageMagick policy for the libvips magick loader via a pinned base-images source component (GHSA-q89f-h332-8q2h)
+  * update copyright years
+
+ -- dionysius <dragon.dionysius@gmail.com>  Mon, 28 Sep 2026 23:42:29 +0200
+
 immich (3.2.2-1) unstable; urgency=medium
 
   * update to [3.2.2](https://github.com/immich-app/immich/releases/tag/v3.2.2)
