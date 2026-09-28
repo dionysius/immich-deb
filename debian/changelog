@@ -1,3 +1,9 @@
+immich (3.2.4-2) unstable; urgency=medium
+
+  * build a single orig tarball, keep base-images as an import-only component
+
+ -- dionysius <dragon.dionysius@gmail.com>  Tue, 29 Sep 2026 00:43:43 +0200
+
 immich (3.2.4-1) unstable; urgency=medium
 
   * update to [3.2.4](https://github.com/immich-app/immich/releases/tag/v3.2.4)
