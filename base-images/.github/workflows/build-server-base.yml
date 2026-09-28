@@ -1,0 +1,68 @@
+name: Build and Push Server Base Images
+
+on:
+  push:
+    tags:
+      - "*"
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  packages: write
+
+jobs:
+  pre-job:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      should_run: ${{ steps.check.outputs.should_run }}
+    steps:
+      - name: Check what should run
+        id: check
+        uses: immich-app/devtools/actions/pre-job@75493d49052d536863fc96100086782c5279b145 # pre-job-action-v2.1.1
+        with:
+          github-token: ${{ github.token }}
+          filters: |
+            server:
+              - 'server/**'
+          force-filters: |
+            - '.github/workflows/build-server-base.yml'
+          force: ${{ startsWith(github.ref, 'refs/tags') || github.ref_name == 'main' }}
+
+  build_and_push:
+    needs: pre-job
+    uses: immich-app/devtools/.github/workflows/multi-runner-build.yml@4d420cf8e5ea499f99b2c2849ff9a219d5f7b178 # multi-runner-build-workflow-v4.0.0
+    if: ${{ fromJSON(needs.pre-job.outputs.should_run).server == true }}
+    strategy:
+      fail-fast: true
+      matrix:
+        target: ["dev", "prod"]
+    permissions:
+      contents: read
+      actions: read
+      packages: write
+    with:
+      image: base-server-${{ matrix.target }}
+      context: server
+      dockerfile: server/Dockerfile
+      target: ${{ matrix.target }}
+      tags: |
+        type=ref,event=branch
+        type=ref,event=pr
+        type=sha,format=long,prefix=commit-
+        type=ref,event=tag
+
+  success-check:
+    needs: build_and_push
+    permissions: {}
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - uses: immich-app/devtools/actions/success-check@81113db03f6d743efee81e0058c0b43f6cd6f36d # success-check-action-v0.0.6
+        with:
+          needs: ${{ toJSON(needs) }}

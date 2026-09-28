@@ -1,0 +1,6 @@
+{
+    "name": "imagemagick",
+    "repository": "ImageMagick/ImageMagick",
+    "version": "7.1.2-21",
+    "revision": "c86de049cefb8dd739e16f0e2fdc1ef8d2006d59"
+}

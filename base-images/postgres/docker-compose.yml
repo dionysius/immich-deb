@@ -1,0 +1,30 @@
+services:
+  postgres:
+    container_name: base_images_postgres
+    user: 1000:1001
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      args:
+        PG_MAJOR: 16
+        VECTORCHORD_TAG: 0.3.0
+        PGVECTOR_TAG: 0.8.0
+        PGVECTORS_TAG: 0.3.0
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/immich_db_password
+      DB_USERNAME_FILE: /run/secrets/immich_db_user
+      DB_DATABASE_NAME: "database_name"
+      POSTGRES_INITDB_ARGS: '--data-checksums'
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    restart: always
+    secrets:
+      - immich_db_user
+      - immich_db_password
+
+secrets:
+  immich_db_user:
+    file: ./secrets/postgres_username.txt
+  immich_db_password:
+    file: ./secrets/postgres_password.txt
