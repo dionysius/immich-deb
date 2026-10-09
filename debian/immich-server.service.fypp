@@ -11,10 +11,8 @@ After=network.target
 # If you want to expose the server to the network directly, you may find the following useful:
 #After=network-online.target
 
-# If immich-machine-learning, postgresql and/or redis are running on this system they should be specified as dependencies,
-# such that immich-server is only started after (`After=`) those have successfully (`Requires=`) started.
-#After=immich-machine-learning.service postgresql.service redis.service
-#Requires=immich-machine-learning.service postgresql.service redis.service
+# Machine learning, database and cache on this host start before and stop after this unit.
+After=immich-machine-learning.service postgresql.service redis-server.service
 
 # If running immich behind a reverse proxy - running on this system - consider ordering it before also:
 #Before=theproxy.service
