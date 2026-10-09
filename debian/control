@@ -89,8 +89,9 @@ Pre-Depends: ${misc:Pre-Depends},
 #          python3-pydantic-settings,
 #          python3-huggingface-tokenizers, # this is missing
 #          ... and maybe more
-# We compile stuff in uv so need a compiler and other headers
+# We compile stuff in uv so need a compiler and other headers, and git for git-sourced dependencies
 Depends: g++,
+         git,
          immich-common,
          libgl-dev,
          ${misc:Depends},

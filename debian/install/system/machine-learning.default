@@ -39,3 +39,5 @@ UV_PYTHON_PREFERENCE=only-managed
 XDG_CACHE_HOME=/var/cache/immich/.cache
 # cache for rustup (watchfiles uses puccinialin/rustup)
 RUSTUP_HOME=/var/cache/immich/.cache/rustup
+# cache for CUDA JIT compiled kernels
+CUDA_CACHE_PATH=/var/cache/immich/.cache/nv

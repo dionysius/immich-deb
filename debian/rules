@@ -116,6 +116,7 @@ override_dh_auto_configure:
 	mkdir -p $(TMPGEODATA)
 	curl -sSL https://download.geonames.org/export/dump/admin1CodesASCII.txt -o $(TMPGEODATA)/admin1CodesASCII.txt
 	curl -sSL https://download.geonames.org/export/dump/admin2Codes.txt -o $(TMPGEODATA)/admin2Codes.txt
+	curl -sSL https://download.geonames.org/export/dump/countryInfo.txt -o $(TMPGEODATA)/countryInfo.txt
 	curl -sSL https://download.geonames.org/export/dump/cities500.zip -o $(TMPGEODATA)/cities500.zip
 	curl -sSL https://raw.githubusercontent.com/nvkelso/natural-earth-vector/v5.1.2/geojson/ne_10m_admin_0_countries.geojson -o $(TMPGEODATA)/ne_10m_admin_0_countries.geojson
 	cd $(TMPGEODATA); unzip -o cities500.zip; rm cities500.zip
