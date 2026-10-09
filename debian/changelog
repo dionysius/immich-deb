@@ -1,5 +1,6 @@
-immich (3.3.1-1) unstable; urgency=medium
+immich (3.3.1-2) unstable; urgency=medium
 
+  * 3.3.x build changes
   * update to [3.3.1](https://github.com/immich-app/immich/releases/tag/v3.3.1)
 
  -- dionysius <dragon.dionysius@gmail.com>  Fri, 09 Oct 2026 07:26:44 +0200
