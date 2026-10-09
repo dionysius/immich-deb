@@ -9,4 +9,4 @@ opts="filenamemangle=s|.*/v(\d\S+)\.tar\.gz|immich_$1.orig.tar.gz|" \
 opts="component=base-images, \
 filenamemangle=s|.*/(\d{12})\.tar\.gz|base-images-$1.tar.gz|" \
   https://github.com/immich-app/base-images/tags \
-  .*/archive/refs/tags/(202609281550)\.tar\.gz ignore
+  .*/archive/refs/tags/(202610021601)\.tar\.gz ignore
