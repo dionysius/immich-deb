@@ -1,3 +1,14 @@
+immich (3.3.3-1) unstable; urgency=medium
+
+  * Units: order immich-server after a local postgresql, redis and machine learning
+  * update to [3.3.3](https://github.com/immich-app/immich/releases/tag/v3.3.3)
+  * Units notify systemd once ready: immich-server once all workers serve, gunicorn for machine learning
+  * fix swapped third-party license lists of immich-cli and immich-web-data
+  * machine learning: set PYTHONUNBUFFERED so python output reaches the journal unbuffered
+  * drop files not used at runtime from the server and cli packages, reducing the package sizes significantly
+
+ -- dionysius <dragon.dionysius@gmail.com>  Thu, 15 Oct 2026 06:20:30 +0200
+
 immich (3.3.1-3) unstable; urgency=medium
 
   * require libvips 8.18.7 for sharp 0.35.5
