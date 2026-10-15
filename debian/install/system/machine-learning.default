@@ -7,6 +7,9 @@
 # Hardware acceleration mode (one of [armnn, cuda, cpu, rocm, openvino, rknn])
 DEVICE=cpu
 
+# Pass python output to the journal as it is written
+PYTHONUNBUFFERED=1
+
 # Currently there are outdated and missing python dependencies in apt repos so
 # the service is run with uv. If possible we'd remove this in the future but
 # is unlikely with all the requirements including which python version is run.
