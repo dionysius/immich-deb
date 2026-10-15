@@ -164,6 +164,20 @@ override_dh_auto_build:
 # Remove prebuilt native binaries for non-matching architectures in node dependencies
 	find $(TMPDEB)/usr/lib/immich -mindepth 1 -type d -regex ".*/prebuilds/[^/]+" ! -name "linux-$(NODE_ARCH)" -exec rm -r {} +
 
+# Remove files not used at runtime: source maps, type declarations, typescript sources (node never
+# strips types under node_modules), docs and package-level test/example/tooling directories
+	find $(TMPDEB)/usr/lib/immich -type f \( -name '*.map' -o -name '*.ts' -o -name '*.mts' -o -name '*.cts' \) -delete
+	find $(TMPDEB)/usr/lib/immich -path '*/node_modules/*' -type f \( -iname '*.md' -o -iname 'readme*' -o -iname 'changelog*' -o -iname 'history*' \) ! -iname 'licen*' -delete
+	find $(TMPDEB)/usr/lib/immich -regextype posix-extended -type d \
+	  -regex '.*/node_modules/(@[^/]+/)?[^/.][^/]*/(test|tests|__tests__|coverage|docs?|examples?|benchmarks?|\.github)' -prune -exec rm -r {} +
+# sharp only loads its native module from src/build/Release
+	find $(TMPDEB)/usr/lib/immich -path '*/node_modules/sharp/src/*' -type f ! -regex '.*/src/build/Release/sharp-[^/]*\.node' -delete
+# geo-tz: only the default (1970) dataset is used; fail if the server starts importing a subpath
+	! grep -rqE "[\"']geo-tz/" $(TMPDEB)/usr/lib/immich/server/dist
+	find $(TMPDEB)/usr/lib/immich -path '*/node_modules/geo-tz/data/*' -type f \( -name 'timezones.geojson.*' -o -name 'timezones-now.geojson.*' \) -delete
+	cd $(TMPDEB)/usr/lib/immich/cli && rm -f eslint.config.mjs mise.toml pnpm-lock.yaml pnpm-workspace.yaml README.md LICENSE
+	find $(TMPDEB)/usr/lib/immich -type d -empty -delete
+
 override_dh_prep:
 	rm -rf $(TMPDEB)/build
 	dh_prep -X $(TMPDEB)

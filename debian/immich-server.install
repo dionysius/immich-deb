@@ -11,5 +11,4 @@ usr/lib/immich/server/dist
 usr/lib/immich/server/helmet.json
 usr/lib/immich/server/node_modules
 usr/lib/immich/server/package.json
-usr/lib/immich/server/pnpm-lock.yaml
 usr/share/doc/immich-server
