@@ -150,8 +150,8 @@ override_dh_auto_build:
 # generate third party licenses info
 # TODO: could also be added to Built:Using or something similar, pnpm has a json output mode that could be parsed
 	pnpm --filter immich --filter @immich/plugin-core licenses list --prod --long | gzip > $(TMPDEB)/usr/share/doc/immich-server/THIRD-PARTY-LICENSES.txt.gz
-	pnpm --filter @immich/sdk --filter immich-web licenses list --prod --long | gzip > $(TMPDEB)/usr/share/doc/immich-cli/THIRD-PARTY-LICENSES.txt.gz
-	pnpm --filter @immich/sdk --filter @immich/cli licenses list --prod --long | gzip > $(TMPDEB)/usr/share/doc/immich-web-data/THIRD-PARTY-LICENSES.txt.gz
+	pnpm --filter @immich/sdk --filter @immich/cli licenses list --prod --long | gzip > $(TMPDEB)/usr/share/doc/immich-cli/THIRD-PARTY-LICENSES.txt.gz
+	pnpm --filter @immich/sdk --filter immich-web licenses list --prod --long | gzip > $(TMPDEB)/usr/share/doc/immich-web-data/THIRD-PARTY-LICENSES.txt.gz
 
 # generate build.env since immich version info is not built-in
 	debian/helpers/generate-build-metadata.sh > $(TMPDEB)/build.env
