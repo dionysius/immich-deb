@@ -12,17 +12,15 @@
 #
 # TARGET is the vchord version to upgrade to; it must be newer than the installed baseline and within
 # immich's supported range (so immich actually runs the UPDATE). Bump it when immich's supported
-# vchord version moves — same maintenance as boot-check.sh's readiness strings.
+# vchord version moves.
 #
 # Usage:  vchord-upgrade-check.sh [--out FILE]     # --out: append the result table to FILE
 # Env:    VCHORD_TARGET  version to upgrade to (default 1.1.1)
 #         VCHORD_REPO    GitHub owner/repo providing the .deb (default supervc-stack/VectorChord)
 #         VCHORD_REV     debian revision of the upstream .deb (default 1)
 #         DBNAME         immich database (default immich)
-#         WAIT           seconds to wait for immich-server readiness (default 180)
 set -u
 OUT="${OUT:-/dev/stdout}"
-WAIT="${WAIT:-180}"
 VCHORD_TARGET="${VCHORD_TARGET:-1.1.1}"
 VCHORD_REPO="${VCHORD_REPO:-supervc-stack/VectorChord}"
 VCHORD_REV="${VCHORD_REV:-1}"
@@ -104,16 +102,10 @@ pm_before=$(psql_immich "SELECT pg_postmaster_start_time()")
 FROM=$(date '+%Y-%m-%d %H:%M:%S')
 
 info "Upgrade vchord (dpkg -i) — the trigger must do the rest, no manual restart"
+# immich-server is Type=notify: the trigger's restart returns once it is ready (or failed).
 dpkg_out=$(DEBIAN_FRONTEND=noninteractive dpkg -i "$deb" 2>&1); echo "$dpkg_out"
 rm -f "$deb"
 
-info "Wait for immich-server to settle (timeout ${WAIT}s)"
-i=0
-while [ "$i" -lt "$WAIT" ]; do
-  systemctl is-failed --quiet immich-server.service && { echo "  immich-server failed"; break; }
-  journalctl -u immich-server.service --no-pager -S "$FROM" 2>/dev/null | grep -qF "Immich Server is listening on" && break
-  sleep 2; i=$((i+2))
-done
 # let postgres finish accepting connections after its restart
 for _ in $(seq 15); do runuser -u postgres -- pg_isready -q && break; sleep 1; done
 pm_after=$(psql_immich "SELECT pg_postmaster_start_time()")

@@ -1,0 +1,153 @@
+Description: server: notify systemd once every worker is ready
+ Each worker reports to the supervisor (main.ts) once it serves: api and
+ maintenance after listening, microservices after startup. Once all started
+ workers have reported, the supervisor runs its onAllReady hook, which sends
+ READY=1 via systemd-notify when NOTIFY_SOCKET is set. Type=notify units thus
+ become active only when immich actually serves, for any
+ IMMICH_WORKERS_INCLUDE/EXCLUDE combination.
+Author: dionysius <dragon.dionysius@gmail.com>
+Forwarded: no
+diff --git a/server/src/app.common.ts b/server/src/app.common.ts
+index bf796efc8..b28337695 100644
+--- a/server/src/app.common.ts
++++ b/server/src/app.common.ts
+@@ -12,7 +12,7 @@ import { ConfigRepository } from 'src/repositories/config.repository.js';
+ import { LoggingRepository } from 'src/repositories/logging.repository.js';
+ import { bootstrapTelemetry } from 'src/repositories/telemetry.repository.js';
+ import { ApiService } from 'src/services/api.service.js';
+-import { useSwagger } from 'src/utils/misc.js';
++import { reportWorkerReady, useSwagger } from 'src/utils/misc.js';
+ 
+ export function configureTelemetry() {
+   const { telemetry } = new ConfigRepository().getEnv();
+@@ -99,4 +99,5 @@ export async function configureExpress(
+   });
+ 
+   logger.log(`${IMMICH_SERVER_START} on ${await app.getUrl()} [v${serverVersion}] [${environment}] `);
++  reportWorkerReady();
+ }
+diff --git a/server/src/main.ts b/server/src/main.ts
+index f1027b740..1ab8bed87 100644
+--- a/server/src/main.ts
++++ b/server/src/main.ts
+@@ -1,6 +1,6 @@
+ import { Kysely, sql } from 'kysely';
+ import { CommandFactory } from 'nest-commander';
+-import { ChildProcess, fork } from 'node:child_process';
++import { ChildProcess, execFile, fork } from 'node:child_process';
+ import { dirname, join } from 'node:path';
+ import { Worker } from 'node:worker_threads';
+ import { PostgresError } from 'postgres';
+@@ -19,6 +19,11 @@ class Workers {
+    */
+   workers: Partial<Record<ImmichWorker, { kill: (signal: NodeJS.Signals) => Promise<void> | void }>> = {};
+ 
++  /**
++   * Running workers that reported they are ready to serve
++   */
++  ready = new Set<ImmichWorker>();
++
+   /**
+    * Fail-safe in case anything dies during restart
+    */
+@@ -119,17 +124,49 @@ class Workers {
+       anyWorker = worker;
+     }
+ 
++    anyWorker.on('message', (message) => message === 'ready' && this.onReady(name));
+     anyWorker.on('error', (error) => this.onError(name, error));
+     anyWorker.on('exit', (exitCode) => this.onExit(name, exitCode));
+ 
+     this.workers[name] = { kill };
+   }
+ 
++  onReady(name: ImmichWorker) {
++    this.ready.add(name);
++
++    if (Object.keys(this.workers).every((worker) => this.ready.has(worker as ImmichWorker))) {
++      this.onAllReady();
++    }
++  }
++
++  /**
++   * Every running worker is ready to serve
++   */
++  onAllReady() {
++    if (process.env.NOTIFY_SOCKET) {
++      this.notifySystemd();
++    }
++  }
++
++  /**
++   * Tell systemd (Type=notify) that startup finished
++   */
++  private notifySystemd() {
++    // node cannot send to the AF_UNIX datagram socket itself
++    execFile('systemd-notify', ['--ready'], (error) => {
++      if (error) {
++        console.error(`systemd-notify failed: ${error}`);
++      }
++    });
++  }
++
+   onError(name: ImmichWorker, error: Error) {
+     console.error(`${name} worker error: ${error}, stack: ${error.stack}`);
+   }
+ 
+   onExit(name: ImmichWorker, exitCode: number | null) {
++    this.ready.delete(name);
++
+     // restart immich server
+     if (exitCode === ExitCode.AppRestart || this.restarting) {
+       this.restarting = true;
+diff --git a/server/src/utils/misc.ts b/server/src/utils/misc.ts
+index dd2b5763b..e4ebc3914 100644
+--- a/server/src/utils/misc.ts
++++ b/server/src/utils/misc.ts
+@@ -11,6 +11,7 @@ import { get, isArray, isDate, isEmpty, isObject, orderBy, unset } from 'lodash-
+ import { cleanupOpenApiDoc } from 'nestjs-zod';
+ import { writeFileSync } from 'node:fs';
+ import path from 'node:path';
++import { parentPort } from 'node:worker_threads';
+ import picomatch from 'picomatch';
+ import { CLIP_MODEL_INFO, JOBS_ASSET_PAGINATION_SIZE, endpointTags, serverVersion } from 'src/constants.js';
+ import { extraModels } from 'src/decorators.js';
+@@ -26,6 +27,17 @@ type SchemaObject = Exclude<ReferenceOrSchemaObject, ReferenceObject>;
+ export class ImmichStartupError extends Error {}
+ export const isStartUpError = (error: unknown): error is ImmichStartupError => error instanceof ImmichStartupError;
+ 
++/**
++ * Tell the supervisor (main.ts) that this worker is ready to serve
++ */
++export const reportWorkerReady = () => {
++  if (parentPort) {
++    parentPort.postMessage('ready');
++  } else {
++    process.send?.('ready');
++  }
++};
++
+ export const getKeyByValue = (object: Record<string, unknown>, value: unknown) =>
+   Object.keys(object).find((key) => object[key] === value);
+ 
+diff --git a/server/src/workers/microservices.ts b/server/src/workers/microservices.ts
+index 0ba1174a4..57d20a857 100644
+--- a/server/src/workers/microservices.ts
++++ b/server/src/workers/microservices.ts
+@@ -7,7 +7,7 @@ import { AppRepository } from 'src/repositories/app.repository.js';
+ import { ConfigRepository } from 'src/repositories/config.repository.js';
+ import { LoggingRepository } from 'src/repositories/logging.repository.js';
+ import { bootstrapTelemetry } from 'src/repositories/telemetry.repository.js';
+-import { isStartUpError } from 'src/utils/misc.js';
++import { isStartUpError, reportWorkerReady } from 'src/utils/misc.js';
+ 
+ export async function bootstrap() {
+   const { telemetry } = new ConfigRepository().getEnv();
+@@ -29,6 +29,7 @@ export async function bootstrap() {
+   await (host ? app.listen(0, host) : app.listen(0));
+ 
+   logger.log(`Immich Microservices is running [v${serverVersion}] [${environment}] `);
++  reportWorkerReady();
+ }
+ 
+ if (!isMainThread) {

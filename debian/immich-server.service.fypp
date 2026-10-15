@@ -28,7 +28,11 @@ EnvironmentFile=/usr/share/doc/immich-server/build.env
 # immich configuration file.
 EnvironmentFile=/etc/immich/server.env
 # Service execution.
-Type=exec
+# Notifies readiness once all workers serve (systemd-readiness-notification.patch), sent via systemd-notify.
+Type=notify
+NotifyAccess=all
+# Covers database migrations on upgrade.
+TimeoutStartSec=15min
 ExecStart=/bin/sh -c ' \
   if [ -z "$UV_THREADPOOL_SIZE" ]; then \
     CPU_CORES=$(/usr/lib/immich/server/bin/get-cpus.sh); \
