@@ -1,10 +1,10 @@
 Description: server: notify systemd once every worker is ready
- Each worker reports to the supervisor (main.ts) once it serves: api and
- maintenance after listening, microservices after startup. Once all started
- workers have reported, the supervisor runs its onAllReady hook, which sends
- READY=1 via systemd-notify when NOTIFY_SOCKET is set. Type=notify units thus
- become active only when immich actually serves, for any
- IMMICH_WORKERS_INCLUDE/EXCLUDE combination.
+ Each worker reports to the supervisor (main.ts) once it is ready: api and
+ maintenance after listening, microservices before its bootstrap, which starts
+ the job workers whose I/O can starve the rest of it. Once all started workers
+ have reported, the supervisor runs its onAllReady hook, which sends READY=1
+ via systemd-notify when NOTIFY_SOCKET is set. Type=notify units thus become
+ active once immich serves, for any IMMICH_WORKERS_INCLUDE/EXCLUDE combination.
 Author: dionysius <dragon.dionysius@gmail.com>
 Forwarded: no
 diff --git a/server/src/app.common.ts b/server/src/app.common.ts
@@ -27,7 +27,7 @@ index bf796efc8..b28337695 100644
 +  reportWorkerReady();
  }
 diff --git a/server/src/main.ts b/server/src/main.ts
-index f1027b740..1ab8bed87 100644
+index f1027b740..34767d147 100644
 --- a/server/src/main.ts
 +++ b/server/src/main.ts
 @@ -1,6 +1,6 @@
@@ -43,7 +43,7 @@ index f1027b740..1ab8bed87 100644
    workers: Partial<Record<ImmichWorker, { kill: (signal: NodeJS.Signals) => Promise<void> | void }>> = {};
  
 +  /**
-+   * Running workers that reported they are ready to serve
++   * Running workers that reported ready
 +   */
 +  ready = new Set<ImmichWorker>();
 +
@@ -70,7 +70,7 @@ index f1027b740..1ab8bed87 100644
 +  }
 +
 +  /**
-+   * Every running worker is ready to serve
++   * Every running worker reported ready
 +   */
 +  onAllReady() {
 +    if (process.env.NOTIFY_SOCKET) {
@@ -101,7 +101,7 @@ index f1027b740..1ab8bed87 100644
      if (exitCode === ExitCode.AppRestart || this.restarting) {
        this.restarting = true;
 diff --git a/server/src/utils/misc.ts b/server/src/utils/misc.ts
-index dd2b5763b..e4ebc3914 100644
+index dd2b5763b..6a3b7f4a5 100644
 --- a/server/src/utils/misc.ts
 +++ b/server/src/utils/misc.ts
 @@ -11,6 +11,7 @@ import { get, isArray, isDate, isEmpty, isObject, orderBy, unset } from 'lodash-
@@ -117,7 +117,7 @@ index dd2b5763b..e4ebc3914 100644
  export const isStartUpError = (error: unknown): error is ImmichStartupError => error instanceof ImmichStartupError;
  
 +/**
-+ * Tell the supervisor (main.ts) that this worker is ready to serve
++ * Tell the supervisor (main.ts) that this worker is ready
 + */
 +export const reportWorkerReady = () => {
 +  if (parentPort) {
@@ -131,7 +131,7 @@ index dd2b5763b..e4ebc3914 100644
    Object.keys(object).find((key) => object[key] === value);
  
 diff --git a/server/src/workers/microservices.ts b/server/src/workers/microservices.ts
-index 0ba1174a4..57d20a857 100644
+index 0ba1174a4..31ecee6fb 100644
 --- a/server/src/workers/microservices.ts
 +++ b/server/src/workers/microservices.ts
 @@ -7,7 +7,7 @@ import { AppRepository } from 'src/repositories/app.repository.js';
@@ -143,11 +143,13 @@ index 0ba1174a4..57d20a857 100644
  
  export async function bootstrap() {
    const { telemetry } = new ConfigRepository().getEnv();
-@@ -29,6 +29,7 @@ export async function bootstrap() {
+@@ -26,6 +26,9 @@ export async function bootstrap() {
+   app.useLogger(logger);
+   app.useWebSocketAdapter(new WebSocketAdapter(app));
+ 
++  // before listen: its bootstrap starts the job workers, whose I/O can starve the rest of it
++  reportWorkerReady();
++
    await (host ? app.listen(0, host) : app.listen(0));
  
    logger.log(`Immich Microservices is running [v${serverVersion}] [${environment}] `);
-+  reportWorkerReady();
- }
- 
- if (!isMainThread) {
