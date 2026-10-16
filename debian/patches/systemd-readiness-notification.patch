@@ -1,10 +1,27 @@
 Description: server: notify systemd once every worker is ready
- Each worker reports to the supervisor (main.ts) once it is ready: api and
- maintenance after listening, microservices before its bootstrap, which starts
- the job workers whose I/O can starve the rest of it. Once all started workers
- have reported, the supervisor runs its onAllReady hook, which sends READY=1
- via systemd-notify when NOTIFY_SOCKET is set. Type=notify units thus become
- active once immich serves, for any IMMICH_WORKERS_INCLUDE/EXCLUDE combination.
+ Each worker reports to the supervisor (main.ts) once it is ready. Once all
+ started workers have reported, the supervisor runs its onAllReady hook, which
+ sends READY=1 via systemd-notify when NOTIFY_SOCKET is set. Type=notify units
+ thus become active only when immich actually serves, for any
+ IMMICH_WORKERS_INCLUDE/EXCLUDE combination.
+ .
+ Ready points:
+  - api and maintenance: after listening, which follows their bootstrap,
+    including database and vector extension migrations.
+  - microservices: after its whole bootstrap (every AppBootstrap and ConfigInit
+    handler, e.g. geodata import and plugin load) and listen. A failing
+    bootstrap step exits the server, and PostgreSQL may restart as soon as a
+    start returned (e.g. immich-db-reqs' vchord trigger in the same apt run).
+ .
+ Microservices starts its job workers only after reporting ready, not in
+ QueueService's AppBootstrap handler: its worker thread shares the libuv
+ threadpool with job I/O, which on slow storage blocks the remaining bootstrap
+ indefinitely. Queue concurrency is applied when the job workers start, as
+ ConfigInit runs before they exist.
+ .
+ The ready report stays off the threadpool: postMessage, process.send and
+ spawning systemd-notify do not use it. systemd-notify runs as a child of the
+ main process, hence NotifyAccess=all in the unit.
 Author: dionysius <dragon.dionysius@gmail.com>
 Forwarded: no
 diff --git a/server/src/app.common.ts b/server/src/app.common.ts
@@ -100,6 +117,42 @@ index f1027b740..34767d147 100644
      // restart immich server
      if (exitCode === ExitCode.AppRestart || this.restarting) {
        this.restarting = true;
+diff --git a/server/src/services/queue.service.ts b/server/src/services/queue.service.ts
+index cc7fc7515..db906bfd3 100644
+--- a/server/src/services/queue.service.ts
++++ b/server/src/services/queue.service.ts
+@@ -44,7 +44,7 @@ export class QueueService extends BaseService {
+   @OnEvent({ name: 'ConfigInit' })
+   async onConfigInit({ newConfig: config }: ArgOf<'ConfigInit'>) {
+     if (this.worker === ImmichWorker.Microservices) {
+-      this.updateConcurrency(config);
++      // concurrency is applied once the workers start
+       return;
+     }
+ 
+@@ -82,13 +82,19 @@ export class QueueService extends BaseService {
+   @OnEvent({ name: 'AppBootstrap', priority: BootstrapEventPriority.JobService })
+   onBootstrap() {
+     this.jobRepository.setup(this.services);
+-    if (this.worker === ImmichWorker.Microservices) {
+-      this.jobRepository.startWorkers();
+-    } else if (this.worker === ImmichWorker.Api) {
++    if (this.worker === ImmichWorker.Api) {
+       this.jobRepository.watchWorkers();
+     }
+   }
+ 
++  /**
++   * Start processing jobs, once bootstrap finished so jobs cannot hold it up
++   */
++  async startWorkers() {
++    this.jobRepository.startWorkers();
++    this.updateConcurrency(await this.getConfig({ withCache: true }));
++  }
++
+   @OnEvent({ name: 'AppShutdown' })
+   onShutdown() {
+     this.jobRepository.teardown();
 diff --git a/server/src/utils/misc.ts b/server/src/utils/misc.ts
 index dd2b5763b..6a3b7f4a5 100644
 --- a/server/src/utils/misc.ts
@@ -131,25 +184,25 @@ index dd2b5763b..6a3b7f4a5 100644
    Object.keys(object).find((key) => object[key] === value);
  
 diff --git a/server/src/workers/microservices.ts b/server/src/workers/microservices.ts
-index 0ba1174a4..31ecee6fb 100644
+index 0ba1174a4..382ec2b32 100644
 --- a/server/src/workers/microservices.ts
 +++ b/server/src/workers/microservices.ts
-@@ -7,7 +7,7 @@ import { AppRepository } from 'src/repositories/app.repository.js';
+@@ -7,7 +7,8 @@ import { AppRepository } from 'src/repositories/app.repository.js';
  import { ConfigRepository } from 'src/repositories/config.repository.js';
  import { LoggingRepository } from 'src/repositories/logging.repository.js';
  import { bootstrapTelemetry } from 'src/repositories/telemetry.repository.js';
 -import { isStartUpError } from 'src/utils/misc.js';
++import { QueueService } from 'src/services/queue.service.js';
 +import { isStartUpError, reportWorkerReady } from 'src/utils/misc.js';
  
  export async function bootstrap() {
    const { telemetry } = new ConfigRepository().getEnv();
-@@ -26,6 +26,9 @@ export async function bootstrap() {
-   app.useLogger(logger);
-   app.useWebSocketAdapter(new WebSocketAdapter(app));
- 
-+  // before listen: its bootstrap starts the job workers, whose I/O can starve the rest of it
-+  reportWorkerReady();
-+
+@@ -29,6 +30,8 @@ export async function bootstrap() {
    await (host ? app.listen(0, host) : app.listen(0));
  
    logger.log(`Immich Microservices is running [v${serverVersion}] [${environment}] `);
++  reportWorkerReady();
++  await app.get(QueueService).startWorkers();
+ }
+ 
+ if (!isMainThread) {

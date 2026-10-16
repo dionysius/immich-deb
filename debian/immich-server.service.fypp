@@ -28,7 +28,7 @@ EnvironmentFile=/usr/share/doc/immich-server/build.env
 # immich configuration file.
 EnvironmentFile=/etc/immich/server.env
 # Service execution.
-# Notifies readiness once the api serves and the other workers started (systemd-readiness-notification.patch), sent via systemd-notify.
+# Notifies readiness once all workers serve (systemd-readiness-notification.patch), sent via systemd-notify.
 Type=notify
 NotifyAccess=all
 # Covers database migrations on upgrade.
