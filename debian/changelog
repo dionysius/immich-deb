@@ -1,3 +1,9 @@
+immich (3.3.3-2) unstable; urgency=medium
+
+  * immich-server: microservices reports ready before its bootstrap, whose job workers can starve the rest of it and block readiness
+
+ -- dionysius <dragon.dionysius@gmail.com>  Fri, 16 Oct 2026 02:15:44 +0200
+
 immich (3.3.3-1) unstable; urgency=medium
 
   * Units: order immich-server after a local postgresql, redis and machine learning
