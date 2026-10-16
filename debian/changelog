@@ -1,3 +1,9 @@
+immich (3.3.3-3) unstable; urgency=medium
+
+  * immich-server: microservices reports ready after its full bootstrap and starts the job workers only then, so job I/O cannot hold up the bootstrap
+
+ -- dionysius <dragon.dionysius@gmail.com>  Fri, 16 Oct 2026 12:44:00 +0200
+
 immich (3.3.3-2) unstable; urgency=medium
 
   * immich-server: microservices reports ready before its bootstrap, whose job workers can starve the rest of it and block readiness
