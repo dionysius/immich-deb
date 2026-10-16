@@ -1,0 +1,9 @@
+#!/bin/sh
+set -e
+
+# Restart the service onto this backend
+if [ "$1" = "configure" ] && [ -d /run/systemd/system ]; then
+  deb-systemd-invoke try-restart immich-machine-learning.service >/dev/null || true
+fi
+
+#DEBHELPER#

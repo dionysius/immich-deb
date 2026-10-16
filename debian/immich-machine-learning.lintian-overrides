@@ -1,0 +1,2 @@
+# bytecode precompiled for the read-only install
+package-installs-python-pycache-dir [usr/lib/immich/machine-learning/immich_ml/*]

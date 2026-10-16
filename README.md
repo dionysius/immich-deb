@@ -80,6 +80,15 @@ gbp buildpackage -b -us -uc
 
 On successful build packages can now be found in the parent directory `ls ../*.deb`.
 
+## License and Use Restrictions
+
+We have received permission to redistribute the InsightFace facial recognition models for this project, as granted via email by Jia Guo on 2nd January 2026. The packages do not contain the models, immich downloads them at runtime. Users of this project are not permitted to:
+
+1. Redistribute the models further, and
+2. Use them for commercial purposes.
+
+Users and developers interested in using these models should review the licensing terms provided in the [InsightFace GitHub repository](https://github.com/deepinsight/insightface).
+
 ## Inspirations and Alternatives
 
 - [immich-native script](https://github.com/arter97/immich-native)

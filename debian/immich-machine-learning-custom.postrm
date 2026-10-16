@@ -1,0 +1,9 @@
+#!/bin/sh
+set -e
+
+# Remove what uv synced at runtime
+if [ "$1" = "remove" ]; then
+  rm -rf /var/cache/immich/uv /var/cache/immich/.cache/rustup
+fi
+
+#DEBHELPER#
