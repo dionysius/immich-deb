@@ -1,3 +1,9 @@
+immich (3.3.4-1) unstable; urgency=medium
+
+  * update to [3.3.4](https://github.com/immich-app/immich/releases/tag/v3.3.4)
+
+ -- dionysius <dragon.dionysius@gmail.com>  Tue, 20 Oct 2026 12:53:49 +0200
+
 immich (3.3.3-3) unstable; urgency=medium
 
   * immich-server: microservices reports ready after its full bootstrap and starts the job workers only then, so job I/O cannot hold up the bootstrap
