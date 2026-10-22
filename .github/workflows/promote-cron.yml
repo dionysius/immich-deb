@@ -5,8 +5,12 @@ on:
     - cron: '0 3 * * *' 
   workflow_dispatch:
 
+permissions: {}
+
 jobs:
   promote:
+    permissions:
+      contents: write
     uses: dionysius/gbp-gha/.github/workflows/promote-release.yml@main
     with:
       in_days: 3
