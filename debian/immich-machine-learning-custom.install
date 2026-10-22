@@ -1,0 +1,5 @@
+machine-learning/README.md usr/lib/immich/machine-learning
+machine-learning/pyproject.toml usr/lib/immich/machine-learning
+machine-learning/uv.lock usr/lib/immich/machine-learning
+usr/lib/immich/machine-learning/bin/start
+usr/lib/immich/machine-learning/bin/uv

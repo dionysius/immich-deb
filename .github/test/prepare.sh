@@ -51,9 +51,17 @@ apt-get update -qq
 info "Install immich (all-in-one: server + ML + db-reqs + redis) [mode: $MODE]"
 if [ "$MODE" = artifacts ]; then
   # Install this arch's binaries plus the arch-independent packages (the latter only built on the
-  # primary arch). Their Depends/Recommends resolve from the repos added above.
+  # primary arch). Their Depends/Recommends resolve from the repos added above. The prebuilt ML
+  # backends conflict with the default immich-machine-learning-custom, see switch-backend.sh.
   arch="$(dpkg --print-architecture)"
-  mapfile -t debs < <(ls "$ARTIFACTS"/*_all.deb "$ARTIFACTS"/*_"$arch".deb 2>/dev/null)
+  debs=()
+  for f in "$ARTIFACTS"/*_all.deb "$ARTIFACTS"/*_"$arch".deb; do
+    case "${f##*/}" in
+      immich-machine-learning-cpu_*|immich-machine-learning-cuda_*|immich-machine-learning-openvino_*|\
+      immich-machine-learning-rocm_*|immich-machine-learning-rknn_*|immich-machine-learning-venv_*) continue ;;
+    esac
+    [ -e "$f" ] && debs+=("$f")
+  done
   [ "${#debs[@]}" -gt 0 ] || error 1 "no matching .deb files (arch=$arch) in $ARTIFACTS"
   printf '  %s\n' "${debs[@]}"
   apt-get install -y "${debs[@]}"

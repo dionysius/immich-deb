@@ -43,10 +43,25 @@ ifeq ($(DEB_HOST_ARCH),amd64)
 	export NODE_ARCH = x64
 endif
 
-# uv version to use (since debian has not packaged it yet)
+# uv version to use to build the machine-learning venvs (since debian has not packaged it yet)
 UV_VERSION = 0.11.26
 UV_SHA256_x86_64 = 6426a73c3837e6e2483ee344cbc00f36394d179afcba6183cb77437e67db4af0
 UV_SHA256_aarch64 = befa1a59c91e96eb601b0fd9a97c03dd666f17baba644b2b4db9c59a767e387e
+
+# prebuilt machine-learning backends: devices on ML_PYTHON share a bundled python and venv
+# (immich-machine-learning-venv) and ship only their own packages, a device on another python bundles
+# its own in a directory of its own; the versions follow upstream's images
+ML_PYTHON = 3.13
+ML_PYTHON_rocm = 3.12
+ML_PYTHON_rknn = 3.12
+ml_python = $(or $(ML_PYTHON_$(1)),$(ML_PYTHON))
+# system libraries of a bundled python and the wheels shared by all devices
+ML_RUNTIME_DEPENDS = libc6 (>= 2.28), libcrypt1, libgcc-s1, libstdc++6, zlib1g
+ML_EXCLUDE = -X /machine-learning/python/ -X /machine-learning/venv/ $(foreach d,$(ML_DEVICES),-X /machine-learning/$(d)/)
+ML_DIR = /usr/lib/immich/machine-learning
+ML_DEVICES_amd64 = cpu cuda openvino rocm
+ML_DEVICES_arm64 = cpu rknn
+ML_DEVICES = $(ML_DEVICES_$(DEB_HOST_ARCH))
 
 # Detect systemd major version for service file templating.
 # On bookworm systemd.pc ships with the systemd package; on newer distros it moved to systemd-dev.
@@ -102,13 +117,11 @@ override_dh_auto_configure:
 	cd $(TMPBUILD); echo "$(BINARYEN_SHA256_$(DEB_BUILD_GNU_CPU)) binaryen.tar.gz" | sha256sum -c -
 	cd $(TMPBUILD); tar --strip-components=1 -xzf binaryen.tar.gz
 
-# obtain uv manually (debian has not yet packaged it, and I think currently this variant is better than downloading it at runtime with pip and python-venv)
+# obtain uv manually (debian has not yet packaged it)
 # ref: https://github.com/astral-sh/uv/releases/download/0.9.13/uv-x86_64-unknown-linux-gnu.tar.gz
 	curl -sSL https://github.com/astral-sh/uv/releases/download/$(UV_VERSION)/uv-$(DEB_BUILD_GNU_CPU)-unknown-$(DEB_BUILD_ARCH_OS)-$(DEB_BUILD_ARCH_LIBC).tar.gz -o $(TMPBUILD)/uv.tar.gz
 	cd $(TMPBUILD); echo "$(UV_SHA256_$(DEB_BUILD_GNU_CPU)) uv.tar.gz" | sha256sum -c -
-	cd $(TMPBUILD); tar --strip-components=1 -xzf uv.tar.gz
-	mkdir -p machine-learning/bin
-	mv $(TMPBUILD)/uv machine-learning/bin
+	cd $(TMPBUILD); tar --strip-components=1 -C bin -xzf uv.tar.gz
 
 # download geodata required for server
 # TODO: is this the responsibility of the package build or should this be done at first run of the server and offer an update script?
@@ -139,19 +152,31 @@ override_dh_auto_build:
 	pnpm --filter @immich/sdk --filter @immich/plugin-sdk --filter @immich/plugin-core install --frozen-lockfile
 	pnpm --filter @immich/sdk --filter @immich/plugin-sdk --filter @immich/plugin-core build
 
-# TODO: predownload and prebuild python packages with uv
+	UV_CACHE_DIR=$(CURDIR)/$(TMPBUILD)/uv-cache UV_PYTHON_INSTALL_DIR=$(CURDIR)/$(TMPBUILD)/uv-python JOBS=$(or $(DEB_BUILD_OPTION_PARALLEL),1) \
+	  debian/helpers/build-ml-venvs.sh machine-learning $(TMPDEB)$(ML_DIR) $(ML_DIR) $(TMPDEB)/ml-backends \
+	  debian/install/system/machine-learning-start-prebuilt.sh $(ML_PYTHON) \
+	  $(foreach d,$(ML_DEVICES),$(d):$(call ml_python,$(d)))
+	install -D $(TMPBUILD)/bin/uv $(TMPDEB)$(ML_DIR)/bin/uv
+	install -D debian/install/system/machine-learning-start-custom.sh $(TMPDEB)$(ML_DIR)/bin/start
 
 # additional doc files
 	mkdir -p $(TMPDEB)/usr/share/doc/immich-server \
 	         $(TMPDEB)/usr/share/doc/immich-web-data \
 	         $(TMPDEB)/usr/share/doc/immich-cli \
-	         $(TMPDEB)/usr/share/doc/immich-machine-learning
+	         $(TMPDEB)/usr/share/doc/immich-machine-learning-venv
 
 # generate third party licenses info
 # TODO: could also be added to Built:Using or something similar, pnpm has a json output mode that could be parsed
 	pnpm --filter immich --filter @immich/plugin-core licenses list --prod --long | gzip > $(TMPDEB)/usr/share/doc/immich-server/THIRD-PARTY-LICENSES.txt.gz
 	pnpm --filter @immich/sdk --filter @immich/cli licenses list --prod --long | gzip > $(TMPDEB)/usr/share/doc/immich-cli/THIRD-PARTY-LICENSES.txt.gz
 	pnpm --filter @immich/sdk --filter immich-web licenses list --prod --long | gzip > $(TMPDEB)/usr/share/doc/immich-web-data/THIRD-PARTY-LICENSES.txt.gz
+	$(TMPDEB)$(ML_DIR)/python/bin/python3 -I debian/helpers/third-party-python.py $(TMPDEB)$(ML_DIR)/venv/lib/python$(ML_PYTHON)/site-packages \
+	  | gzip -n > $(TMPDEB)/usr/share/doc/immich-machine-learning-venv/THIRD-PARTY-LICENSES.txt.gz
+	for d in $(ML_DEVICES); do \
+	  mkdir -p $(TMPDEB)/usr/share/doc/immich-machine-learning-$$d; \
+	  $(TMPDEB)$(ML_DIR)/python/bin/python3 -I debian/helpers/third-party-python.py $(TMPDEB)/ml-backends/$$d$(ML_DIR)/venv/lib/python*/site-packages $(TMPDEB)/ml-backends/$$d$(ML_DIR)/$$d/venv/lib/python*/site-packages \
+	    | gzip -n > $(TMPDEB)/usr/share/doc/immich-machine-learning-$$d/THIRD-PARTY-LICENSES.txt.gz; \
+	done
 
 # generate build.env since immich version info is not built-in
 	debian/helpers/generate-build-metadata.sh > $(TMPDEB)/build.env
@@ -187,15 +212,28 @@ execute_before_dh_installsystemd:
 	fypp -DSYSTEMD_MAJOR=$(SYSTEMD_MAJOR) debian/immich-server.service.fypp debian/immich-server.service
 	fypp -DSYSTEMD_MAJOR=$(SYSTEMD_MAJOR) debian/immich-machine-learning.service.fypp debian/immich-machine-learning.service
 
+# devices on ML_PYTHON use the shared venv, the others bundle their own
+execute_before_dh_gencontrol:
+	echo 'ml:Depends=$(ML_RUNTIME_DEPENDS)' >> debian/immich-machine-learning-venv.substvars
+	$(foreach d,$(ML_DEVICES),echo 'ml:Depends=$(if $(filter-out $(ML_PYTHON),$(call ml_python,$(d))),$(ML_RUNTIME_DEPENDS),immich-machine-learning-venv (= $(DEB_VERSION)))' >> debian/immich-machine-learning-$(d).substvars;)
+
 override_dh_installsystemd:
 	dh_installsystemd -pimmich-server --no-start --restart-after-upgrade
 	dh_installsystemd -pimmich-machine-learning
 
-override_dh_strip:
-	dh_strip -a -X /prebuilds/
+# the machine-learning python and wheels ship prebuilt and partly patchelf-ed shared objects
+override_dh_dwz:
+	dh_dwz -a $(ML_EXCLUDE)
 
+override_dh_strip:
+	dh_strip -a -X /prebuilds/ $(ML_EXCLUDE)
+
+override_dh_makeshlibs:
+	dh_makeshlibs -a $(ML_EXCLUDE)
+
+# the machine-learning system libraries are declared in debian/control, the device ones are left to the admin
 override_dh_shlibdeps:
-	dh_shlibdeps -a -X /prebuilds/ -- --ignore-missing-info
+	dh_shlibdeps -a -X /prebuilds/ $(ML_EXCLUDE) -- --ignore-missing-info
 
 override_dh_installman:
 	mkdir -p $(TMPDEB)/man/immich-cli $(TMPDEB)/man/immich-server

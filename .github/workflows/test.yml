@@ -110,3 +110,17 @@ jobs:
         with:
           instance: immich-test
           run: bash .github/test/vchord-upgrade-check.sh --out "$GITHUB_STEP_SUMMARY"
+
+      - name: Switch to the prebuilt cpu backend
+        # The install above runs the default immich-machine-learning-custom (uv at runtime); the
+        # prebuilt backends replace it. cpu is the one every runner can execute.
+        uses: dionysius/incus-zabbly-actions/exec@v1
+        with:
+          instance: immich-test
+          run: bash .github/test/switch-backend.sh "$PWD/artifacts" cpu
+
+      - name: Boot-check (prebuilt cpu backend)
+        uses: dionysius/incus-zabbly-actions/exec@v1
+        with:
+          instance: immich-test
+          run: bash .github/test/boot-check.sh --out "$GITHUB_STEP_SUMMARY"

@@ -4,33 +4,16 @@
 
 # Set to true to disable color-coded log output
 #NO_COLOR=false
-# Hardware acceleration mode (one of [armnn, cuda, cpu, rocm, openvino, rknn])
-DEVICE=cpu
+# With immich-machine-learning-custom, the service runs with uv: set the
+# hardware acceleration mode (one of [armnn, cuda, cpu, rocm, openvino, rknn])
+# and any uv setting here, their defaults are in its start script
+# /usr/lib/immich/machine-learning/bin/start. The prebuilt backends
+# immich-machine-learning-<device> ignore both.
+# more options: https://docs.astral.sh/uv/reference/environment/#environment-variables
+#DEVICE=cpu
 
 # Pass python output to the journal as it is written
 PYTHONUNBUFFERED=1
-
-# Currently there are outdated and missing python dependencies in apt repos so
-# the service is run with uv. If possible we'd remove this in the future but
-# is unlikely with all the requirements including which python version is run.
-# uv will download and verify dependencies as defined by the lock file.
-# Defaults are provided for cpu mode. You may need to customize some options to
-# make your hardware-acceleration work.
-# more options: https://docs.astral.sh/uv/reference/environment/#environment-variables
-# point uv paths to folders we are allowed to write
-UV_CACHE_DIR=/var/cache/immich/uv/cache
-UV_PROJECT_ENVIRONMENT=/var/cache/immich/uv/venv
-UV_PYTHON_INSTALL_DIR=/var/cache/immich/uv/python
-# general settings
-UV_COMPILE_BYTECODE=true
-UV_FROZEN=true
-UV_NO_DEV=true
-UV_NO_EDITABLE=true
-UV_NO_PROGRESS=true
-UV_REQUIRE_HASHES=true
-# managed python
-UV_PYTHON=3.12
-UV_PYTHON_PREFERENCE=only-managed
 
 # Since this file exposes environment variables to the immich-machine-learning
 # service, any variable customization for modules can also be set here.
@@ -40,7 +23,5 @@ UV_PYTHON_PREFERENCE=only-managed
 #LD_PRELOAD=libmimalloc.so.3
 # cache for everything respecting the XDG specification
 XDG_CACHE_HOME=/var/cache/immich/.cache
-# cache for rustup (watchfiles uses puccinialin/rustup)
-RUSTUP_HOME=/var/cache/immich/.cache/rustup
 # cache for CUDA JIT compiled kernels
 CUDA_CACHE_PATH=/var/cache/immich/.cache/nv

@@ -22,12 +22,13 @@ EnvironmentFile=/usr/share/doc/immich-machine-learning/build.env
 # immich configuration file.
 EnvironmentFile=/etc/immich/machine-learning.env
 # Service execution.
-# gunicorn notifies readiness once it listens, from a child of uv.
+# gunicorn notifies readiness once it listens, from a child process.
 Type=notify
 NotifyAccess=all
-# Covers the uv dependency sync on first start and after upgrades.
+# Covers the uv dependency sync of immich-machine-learning-custom on first start and after upgrades.
 TimeoutStartSec=15min
-ExecStart=/bin/sh -c 'exec /usr/lib/immich/machine-learning/bin/uv run --extra $DEVICE -m immich_ml'
+# Provided by the installed immich-machine-learning-<backend> package.
+ExecStart=/usr/lib/immich/machine-learning/bin/start
 WorkingDirectory=/usr/lib/immich/machine-learning
 # Restart on failure
 Restart=on-failure

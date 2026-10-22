@@ -1,0 +1,15 @@
+# bundled python runtime and wheels, bytecode precompiled for the read-only install
+package-installs-python-pycache-dir [usr/lib/immich/machine-learning/*]
+unstripped-binary-or-object [usr/lib/immich/machine-learning/*]
+shared-library-lacks-prerequisites [usr/lib/immich/machine-learning/*]
+embedded-library * [usr/lib/immich/machine-learning/*]
+executable-not-elf-or-script [usr/lib/immich/machine-learning/*]
+unusual-interpreter * [usr/lib/immich/machine-learning/*]
+python3-script-but-no-python3-dep * [usr/lib/immich/machine-learning/*]
+shell-script-fails-syntax-check [usr/lib/immich/machine-learning/*]
+library-not-linked-against-libc [usr/lib/immich/machine-learning/*]
+undeclared-elf-prerequisites * [usr/lib/immich/machine-learning/*]
+custom-library-search-path * [usr/lib/immich/machine-learning/*]
+hardening-no-pie [usr/lib/immich/machine-learning/*python/bin/python*]
+# libc6 comes with immich-machine-learning-venv or the bundled python
+missing-dependency-on-libc *
