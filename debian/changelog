@@ -1,3 +1,9 @@
+immich (3.3.6-1) unstable; urgency=medium
+
+  * update to [3.3.6](https://github.com/immich-app/immich/releases/tag/v3.3.6)
+
+ -- dionysius <dragon.dionysius@gmail.com>  Thu, 05 Nov 2026 13:11:17 +0100
+
 immich (3.3.5-1) unstable; urgency=medium
 
   * update to [3.3.5](https://github.com/immich-app/immich/releases/tag/v3.3.5)
