@@ -1,0 +1,15 @@
+#!/bin/sh
+set -e
+
+# Versions before 3.0.1-2 lack the vchord.so trigger (see immich-db-reqs.triggers), so a vchord
+# upgraded in the same run would leave PostgreSQL on the old library.
+if [ "$1" = "upgrade" ] && dpkg --compare-versions "$2" lt "3.0.1-2~"; then
+  cat >&2 <<EOF
+immich-db-reqs: upgrading directly from $2 is not recommended.
+Install the immich packages in version 3.3.6 first, then upgrade again.
+If a postgresql-*-vchord package was already upgraded in this run, restart PostgreSQL afterwards.
+EOF
+  exit 1
+fi
+
+#DEBHELPER#
