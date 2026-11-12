@@ -1,3 +1,13 @@
+immich (3.4.1-1) unstable; urgency=medium
+
+  * update to [3.4.1](https://github.com/immich-app/immich/releases/tag/v3.4.1)
+  * immich-web-data: install the CSP manifest required by IMMICH_HELMET_FILE and .well-known
+  * immich-server: recommend pigz for parallel database backup compression and restic for FUTO Backups
+  * immich-machine-learning: default to model revision v2, RKNN contexts default to the number of NPU cores
+  * immich-db-reqs: allow vectorchord 1.1, upgrades from before 3.0.1-2 need to go through 3.3.6 first
+
+ -- dionysius <dragon.dionysius@gmail.com>  Thu, 12 Nov 2026 04:24:42 +0100
+
 immich (3.3.6-1) unstable; urgency=medium
 
   * update to [3.3.6](https://github.com/immich-app/immich/releases/tag/v3.3.6)
