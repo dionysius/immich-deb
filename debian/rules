@@ -15,6 +15,9 @@ PNPMSTORE = .pnpm-store
 export NODE_ENV = production
 export CI = 1
 export COREPACK_ENABLE_DOWNLOAD_PROMPT = 0
+# pnpm hardlinks packages from its store (hopefully unlikely that admins put immich folders on different filesystems)
+# even with package-import-method=copy there were some sharp builds hardlinked
+export pnpm_config_store_dir = $(CURDIR)/$(PNPMSTORE)
 
 # export dpkg variables for helper scripts
 export DEB_SOURCE DEB_VERSION DEB_VERSION_UPSTREAM
@@ -72,7 +75,6 @@ endif
 override_dh_auto_clean:
 	rm -rf $(PNPMSTORE)
 	rm -rf server/dist web/build packages/cli/dist packages/plugin-core/dist packages/sdk/dist packages/plugin-sdk/dist
-	rm -f $(CURDIR)/.npmrc
 
 override_dh_auto_configure:
 	mkdir -p $(TMPBUILD)/bin
@@ -81,13 +83,8 @@ override_dh_auto_configure:
 	npm install --no-save corepack
 	ln -srf node_modules/.bin/corepack $(TMPBUILD)/bin/corepack
 	corepack enable
-	corepack prepare pnpm@latest-11 --activate
+	corepack prepare pnpm@latest-12 --activate
 	ln -srf node_modules/.bin/pnpm $(TMPBUILD)/bin/pnpm
-
-# create local .npmrc for pnpm configuration to avoid global config changes
-# for now we allow hardlinks from pnpm (hopefully unlikely that admins put immich folders on different filesystems)
-# even with package-import-method=copy there were some sharp builds hardlinked
-	printf "store-dir=$(PNPMSTORE)\n" > $(CURDIR)/.npmrc
 
 # obtain extism-js manually (npm doesn't provide it)
 # ref: https://github.com/extism/js-pdk/releases/download/v1.2.0/extism-js-x86_64-linux-v1.2.0.gz
@@ -172,6 +169,8 @@ override_dh_auto_build:
 	  -regex '.*/node_modules/(@[^/]+/)?[^/.][^/]*/(test|tests|__tests__|coverage|docs?|examples?|benchmarks?|\.github)' -prune -exec rm -r {} +
 # sharp only loads its native module from src/build/Release
 	find $(TMPDEB)/usr/lib/immich -path '*/node_modules/sharp/src/*' -type f ! -regex '.*/src/build/Release/sharp-[^/]*\.node' -delete
+# better-sqlite3 only loads its native module from build/Release
+	find $(TMPDEB)/usr/lib/immich -regextype posix-extended -regex '.*/node_modules/better-sqlite3/(deps|src|binding\.gyp)' -prune -exec rm -r {} +
 # geo-tz: only the default (1970) dataset is used; fail if the server starts importing a subpath
 	! grep -rqE "[\"']geo-tz/" $(TMPDEB)/usr/lib/immich/server/dist
 	find $(TMPDEB)/usr/lib/immich -path '*/node_modules/geo-tz/data/*' -type f \( -name 'timezones.geojson.*' -o -name 'timezones-now.geojson.*' \) -delete
