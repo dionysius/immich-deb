@@ -1,2 +1,4 @@
 usr/share/doc/immich-web-data
 web/build/* usr/share/immich/web
+web/build/.csp.json usr/share/immich/web
+web/build/.well-known usr/share/immich/web
