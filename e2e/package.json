@@ -1,6 +1,6 @@
 {
   "name": "immich-e2e",
-  "version": "3.4.1",
+  "version": "3.4.2",
   "description": "",
   "main": "index.js",
   "type": "module",
@@ -23,7 +23,7 @@
   "license": "GNU Affero General Public License version 3",
   "devDependencies": {
     "@eslint/js": "^10.0.0",
-    "@futo-org/backups-orchestrator-ui": "1.16.0",
+    "@futo-org/backups-orchestrator-ui": "1.18.1",
     "@immich/cli": "workspace:*",
     "@immich/e2e-auth-server": "workspace:*",
     "@immich/sdk": "workspace:*",
